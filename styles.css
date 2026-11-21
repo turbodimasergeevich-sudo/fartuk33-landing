@@ -40,6 +40,7 @@ img{max-width:100%;display:block}
 .section-dark{background:var(--dark);color:#fff}
 .section-dark h2,.section-dark h3{color:#fff}
 .section-dark p{color:rgba(255,255,255,.78)}
+.section-dark .eyebrow{color:#ff9b6a}
 .section-dark .field label{color:rgba(255,255,255,.92)}
 .section-dark .consent span{color:rgba(255,255,255,.85)}
 .section-dark .result-note,.section-dark .contact-note{color:rgba(255,255,255,.7)}
