@@ -307,6 +307,11 @@ if (new URLSearchParams(location.search).get('admin') === '1') {
   document.body.appendChild(link);
 }
 
+/* ============================================================
+   Некритичные улучшения идут после первого кадра, чтобы не блокировать
+   загрузку калькулятора и основного контента.
+   ============================================================ */
+function initEnhancements() {
 /* ---------- Scroll reveal ---------- */
 if (!reduceMotion && 'IntersectionObserver' in window) {
   const targets = document.querySelectorAll(
@@ -585,3 +590,10 @@ try {
 } catch (e) { /* приватный режим — используем вариант a */ }
 document.body.classList.add('hero-' + heroVariant);
 trackGoal('hero_variant_' + heroVariant);
+}
+
+if ('requestIdleCallback' in window) {
+  requestIdleCallback(initEnhancements, { timeout: 800 });
+} else {
+  window.addEventListener('load', () => setTimeout(initEnhancements, 0));
+}
