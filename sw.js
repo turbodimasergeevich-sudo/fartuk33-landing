@@ -1,4 +1,4 @@
-const CACHE = 'fartuk33-v5';
+const CACHE = 'fartuk33-v6';
 const ASSETS = [
   './index.html',
   './admin.html',
@@ -6,7 +6,9 @@ const ASSETS = [
   './sitemap.xml',
   './robots.txt',
   './manifest.webmanifest',
-  './icon.svg'
+  './icon.svg',
+  './icon-32.png',
+  './og-image.png'
 ];
 
 self.addEventListener('install', (event) => {

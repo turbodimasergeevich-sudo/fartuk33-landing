@@ -382,14 +382,19 @@ $('#sampleForm').addEventListener('submit', async (e) => {
 });
 
 /* ---------- Мобильное меню ---------- */
+function closeMenu() {
+  $('#nav').classList.remove('open');
+  $('#menuToggle').setAttribute('aria-expanded', 'false');
+}
 $('#menuToggle').addEventListener('click', (e) => {
   const open = $('#nav').classList.toggle('open');
   e.currentTarget.setAttribute('aria-expanded', String(open));
 });
-$$('#nav a').forEach((a) => a.addEventListener('click', () => {
-  $('#nav').classList.remove('open');
-  $('#menuToggle').setAttribute('aria-expanded', 'false');
-}));
+$$('#nav a').forEach((a) => a.addEventListener('click', closeMenu));
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeMenu(); });
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('#nav') && !e.target.closest('#menuToggle')) closeMenu();
+});
 
 /* ---------- Скрытая админ-ссылка (?admin=1) ---------- */
 if (new URLSearchParams(location.search).get('admin') === '1') {
@@ -585,6 +590,10 @@ viewerStage.addEventListener('pointercancel', () => { dragging = false; });
 $('#viewerReset').addEventListener('click', () => {
   rotX = -12; rotY = -20;
   viewerPanel.style.transform = 'rotateX(-12deg) rotateY(-20deg)';
+});
+$('#viewerFullscreen').addEventListener('click', () => {
+  if (document.fullscreenElement) document.exitFullscreen();
+  else if (viewerStage.requestFullscreen) viewerStage.requestFullscreen().catch(() => {});
 });
 
 /* ---------- Карусель кейсов ---------- */
