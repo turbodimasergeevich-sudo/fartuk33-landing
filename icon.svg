@@ -2,5 +2,5 @@
   <rect width="512" height="512" rx="96" fill="#161A1F"/>
   <rect x="96" y="96" width="320" height="320" rx="48" fill="#D9683C"/>
   <text x="256" y="300" font-family="Arial,sans-serif" font-size="170" font-weight="800" fill="#fff" text-anchor="middle">33</text>
-  <text x="256" y="370" font-family="Arial,sans-serif" font-size="46" font-weight="700" fill="#fff" text-anchor="middle" letter-spacing="8">ММ</text>
+  <text x="256" y="370" font-family="Arial,sans-serif" font-size="34" font-weight="700" fill="#fff" text-anchor="middle" letter-spacing="4">ЗАЩИТА</text>
 </svg>

@@ -1,4 +1,4 @@
-const CACHE = 'fartuk33-v8';
+const CACHE = 'fartuk33-v9';
 const ASSETS = [
   './index.html',
   './admin.html',
@@ -7,6 +7,7 @@ const ASSETS = [
   './robots.txt',
   './manifest.webmanifest',
   './icon.svg',
+  './hero-visual.svg',
   './icon-32.png',
   './og-image.png'
 ];

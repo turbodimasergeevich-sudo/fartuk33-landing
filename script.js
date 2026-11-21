@@ -1,5 +1,5 @@
 /* ============================================================
-   Лендинг «3D-фартук 33 мм» — калькулятор и формы
+   Лендинг «3D-фартук 6 мм» — калькулятор и формы
    Все ценовые коэффициенты вынесены в CONFIG — меняются без правки логики.
    ============================================================ */
 
@@ -10,7 +10,7 @@
   — композитный/МДФ-фартук: ≈ 2 900–4 000 ₽/м² — meb96.ru, vseinstrumenti.ru;
   — фартук из кварцевого агломерата: 12 700–33 400 ₽/м² — etnaquartz.ru.
 
-  Наш продукт — жёсткая 3D-панель 33 мм: позиционируем выше композитных
+  Наш продукт — жёсткая 3D-панель 6 мм с защитой Меланин (степень 33): позиционируем выше композитных
   панелей, но ниже камня. База 5 200 ₽/м² — примерная, заменить на вашу
   реальную себестоимость/цену перед запуском.
 */
@@ -367,7 +367,7 @@ calcForm.addEventListener('submit', async (e) => {
   btn.textContent = 'Отправить запрос';
   $('#calcSuccessText').textContent =
     `${fmt(r.area)} м² · ${r.panels} шт. · ${fmtMoney(r.price)}. Менеджер уточнит счёт.`;
-  const message = `Здравствуйте! Интересует 3D-фартук 33 мм. Размер ${d.width}×${d.height} м, площадь ${fmt(r.area)} м², коллекция ${COLLECTION_NAMES[d.collection] || d.collection}, тип клиента ${CLIENT_NAMES[d.clientType] || d.clientType}, город ${d.city === 'kazan' ? 'Казань' : 'другой город РФ'}. Ориентировочная стоимость ${fmtMoney(r.price)}. Прошу КП и образец.`;
+  const message = `Здравствуйте! Интересует 3D-фартук 6 мм с защитой Меланин 33. Размер ${d.width}×${d.height} м, площадь ${fmt(r.area)} м², коллекция ${COLLECTION_NAMES[d.collection] || d.collection}, тип клиента ${CLIENT_NAMES[d.clientType] || d.clientType}, город ${d.city === 'kazan' ? 'Казань' : 'другой город РФ'}. Ориентировочная стоимость ${fmtMoney(r.price)}. Прошу КП и образец.`;
   $('#shareTg').href = 'https://t.me/share/url?url=' + encodeURIComponent(location.href.split('?')[0]) + '&text=' + encodeURIComponent(message);
   $('#shareWa').href = 'https://wa.me/?text=' + encodeURIComponent(message);
   $('#calcSuccess').hidden = false;
@@ -452,7 +452,7 @@ document.addEventListener('click', (e) => {
 /* ---------- Скрытая админ-ссылка (?admin=1) ---------- */
 if (new URLSearchParams(location.search).get('admin') === '1') {
   const link = document.createElement('a');
-  link.href = 'admin.html?v=7';
+  link.href = 'admin.html?v=8';
   link.className = 'admin-floating';
   link.textContent = 'Админ: заявки';
   document.body.appendChild(link);
@@ -727,7 +727,7 @@ $('#pricePdf').addEventListener('click', () => {
     ['Вырез под розетку, ₽/шт', fmtMoney(CONFIG.optionCost.cutout)],
     ['Доставка: Казань / регионы', '0 ₽ / ' + fmtMoney(CONFIG.deliveryCost.region)]
   ];
-  openPrintable('Прайс-лист · 3D-фартук 33 мм', rows, 'Цены ориентировочные. Точный счёт формируется после согласования образца и партии. Укажите «Сохранить как PDF» в окне печати.');
+  openPrintable('Прайс-лист · 3D-фартук 6 мм · Меланин 33', rows, 'Цены ориентировочные. Точный счёт формируется после согласования образца и партии. Укажите «Сохранить как PDF» в окне печати.');
 });
 $('#mobilePricePdf').addEventListener('click', () => $('#pricePdf').click());
 $('#trustPricePdf').addEventListener('click', () => $('#pricePdf').click());
@@ -735,11 +735,11 @@ $('#trustTechPdf').addEventListener('click', () => $('#techPdf').click());
 $('#calcPdf').addEventListener('click', () => {
   const d = readCalc();
   const r = compute(d);
-  openPrintable('Расчёт стоимости · 3D-фартук 33 мм', [
+  openPrintable('Расчёт стоимости · 3D-фартук 6 мм · Меланин 33', [
     ['Размер фартука', `${d.width} × ${d.height} м`],
     ['Площадь', fmt(r.area, 2) + ' м²'],
     ['С запасом на подрезку', fmt(r.areaWithWaste, 2) + ' м²'],
-    ['Панелей 33 мм', r.panels + ' шт.'],
+    ['Панелей 6 мм', r.panels + ' шт.'],
     ['Коллекция', COLLECTION_NAMES[d.collection] || d.collection],
     ['Тип клиента', CLIENT_NAMES[d.clientType] || d.clientType],
     ['Углы / вырезы', `${d.corners} / ${d.cutouts} шт.`],
@@ -749,8 +749,10 @@ $('#calcPdf').addEventListener('click', () => {
   ], 'Расчёт ориентировочный. Точный счёт — после согласования образца и партии.');
 });
 $('#techPdf').addEventListener('click', () => {
-  openPrintable('Техническая карта · 3D-фартук 33 мм', [
-    ['Толщина', '33 мм'],
+  openPrintable('Техническая карта · 3D-фартук 6 мм · Меланин 33', [
+    ['Толщина', '6 мм'],
+    ['Степень защиты', '33'],
+    ['Вид защиты', 'Меланин'],
     ['Размер панели', 'уточняется'],
     ['Вес', 'уточняется'],
     ['Влагостойкость', 'уточняется'],
