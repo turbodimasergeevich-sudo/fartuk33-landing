@@ -1,8 +1,10 @@
-const CACHE = 'fartuk33-v3';
+const CACHE = 'fartuk33-v4';
 const ASSETS = [
   './index.html',
   './admin.html',
   './privacy.html',
+  './sitemap.xml',
+  './robots.txt',
   './manifest.webmanifest',
   './icon.svg'
 ];

@@ -6,9 +6,36 @@
   <title>3D-фартук 33 мм для кухни — поставщик из Казани</title>
   <meta name="description" content="Жёсткие 3D-панели толщиной 33 мм для кухонь. Поставщик из Казани, отгрузка по России. Онлайн-расчёт стоимости, образцы и работа с дизайнерами.">
   <meta name="theme-color" content="#161A1F">
+  <link rel="canonical" href="https://turbodimasergeevich-sudo.github.io/fartuk33-landing/">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="ru_RU">
+  <meta property="og:url" content="https://turbodimasergeevich-sudo.github.io/fartuk33-landing/">
+  <meta property="og:title" content="3D-фартук 33 мм для кухни — поставщик из Казани">
+  <meta property="og:description" content="Жёсткие панели 33 мм. Онлайн-расчёт стоимости, образцы, 3D-модели и отгрузка по России.">
+  <meta property="og:image" content="https://turbodimasergeevich-sudo.github.io/fartuk33-landing/assets/kitchen-preview.webp">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="3D-фартук 33 мм — поставщик из Казани">
+  <meta name="twitter:description" content="Онлайн-расчёт стоимости, образцы и 3D-модели панелей 33 мм.">
+  <meta name="twitter:image" content="https://turbodimasergeevich-sudo.github.io/fartuk33-landing/assets/kitchen-preview.webp">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="icon-192.png">
-  <link rel="stylesheet" href="styles.css?v=14">
+  <link rel="stylesheet" href="styles.css?v=15">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "name": "Поставщик 3D-фартуков 33 мм",
+    "description": "Жёсткие 3D-панели толщиной 33 мм для кухонь. Работаем с дизайнерами, подрядчиками и дилерами.",
+    "url": "https://turbodimasergeevich-sudo.github.io/fartuk33-landing/",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "Казань",
+      "addressRegion": "Республика Татарстан",
+      "addressCountry": "RU"
+    },
+    "areaServed": "Российская Федерация"
+  }
+  </script>
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -247,6 +274,9 @@
                   <input type="text" id="calcCompany" placeholder="Название студии или компании">
                 </div>
               </div>
+              <div class="hp-field" aria-hidden="true">
+                <label>Не заполняйте это поле<input type="text" id="calcHp" tabindex="-1" autocomplete="off"></label>
+              </div>
               <label class="consent">
                 <input type="checkbox" id="calcConsent" required>
                 <span>Согласен на <a href="privacy.html" target="_blank" rel="noopener">обработку персональных данных</a></span>
@@ -346,6 +376,59 @@
       </div>
     </section>
 
+    <!-- SAMPLE REQUEST -->
+    <section class="section" id="sample">
+      <div class="container sample-grid">
+        <div>
+          <div class="eyebrow">Образцы</div>
+          <h2>Получите образец 33 мм в свой проект</h2>
+          <p>Выберите текстуру и укажите, куда отправить образец. Менеджер согласует партию и сроки доставки.</p>
+          <div class="sample-steps">
+            <span><b>1</b> Выбрать текстуру</span>
+            <span><b>2</b> Указать адрес</span>
+            <span><b>3</b> Получить образец</span>
+          </div>
+        </div>
+        <form class="sample-form" id="sampleForm" novalidate>
+          <div class="field">
+            <label for="sampleTexture">Текстура образца</label>
+            <select id="sampleTexture">
+              <option value="stone">Камень</option>
+              <option value="wood">Дерево</option>
+              <option value="concrete">Бетон</option>
+              <option value="3d">3D-геометрия</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="sampleCity">Город</label>
+            <input type="text" id="sampleCity" value="Казань">
+          </div>
+          <div class="field">
+            <label for="sampleAddress">Адрес доставки / офис студии</label>
+            <input type="text" id="sampleAddress" placeholder="Улица, дом, офис">
+          </div>
+          <div class="field">
+            <label for="sampleContact">Телефон / Telegram</label>
+            <input type="text" id="sampleContact" placeholder="+7 (___) ___-__-__ или @username" required>
+            <small class="error" data-error="sampleContact"></small>
+          </div>
+          <div class="hp-field" aria-hidden="true">
+            <label>Не заполняйте это поле<input type="text" id="sampleHp" tabindex="-1" autocomplete="off"></label>
+          </div>
+          <label class="consent">
+            <input type="checkbox" id="sampleConsent" required>
+            <span>Согласен на <a href="privacy.html" target="_blank" rel="noopener">обработку персональных данных</a></span>
+          </label>
+          <small class="error" data-error="sampleConsent"></small>
+          <button type="submit" class="btn btn-accent btn-block">Запросить образец</button>
+          <div class="form-success" id="sampleSuccess" hidden>
+            <b>✓ Заявка на образец отправлена</b>
+            <span>Менеджер свяжется для согласования партии и доставки.</span>
+          </div>
+        </form>
+      </div>
+    </section>
+
     <!-- 3D VIEWER -->
     <section class="section section-dark" id="viewer">
       <div class="container viewer-grid">
@@ -403,6 +486,47 @@
               <tr><th scope="row">Способ монтажа</th><td>уточняется</td></tr>
             </tbody>
           </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- TRUST -->
+    <section class="section section-light" id="trust">
+      <div class="container">
+        <div class="section-head center">
+          <div class="eyebrow">Практика</div>
+          <h2>С кем работаем и что подтверждаем</h2>
+        </div>
+        <div class="trust-stats">
+          <div><b>33 мм</b><span>рабочая толщина панели</span></div>
+          <div><b>3–9 дней</b><span>отгрузка по России</span></div>
+          <div><b>4</b><span>коллекции текстур</span></div>
+          <div><b>1 день</b><span>на монтаж фартука</span></div>
+        </div>
+        <div class="logo-strip" aria-label="Типы клиентов">
+          <span>ДИЗАЙН-СТУДИИ</span>
+          <span>ПОДРЯДЧИКИ</span>
+          <span>МЕБЕЛЬНЫЕ САЛОНЫ</span>
+          <span>АРХИТЕКТОРЫ</span>
+        </div>
+        <div class="reviews">
+          <article class="review-card">
+            <p>«Пришла партия ровно по замерам, стыки сошлись без переделок. Толщина реально держит геометрию.»</p>
+            <footer><b>Дизайн-студия</b><span>Казань · пример отзыва, заменить на реальный</span></footer>
+          </article>
+          <article class="review-card">
+            <p>«Образец прислали быстро, текстура совпала с каталогом. Рассчёт в калькуляторе почти не отличался от счёта.»</p>
+            <footer><b>Подрядчик</b><span>Регион · пример отзыва, заменить на реальный</span></footer>
+          </article>
+          <article class="review-card">
+            <p>«Удобно, что есть техкарта и 3D-модель — сразу понятно, как панель встанет в проект.»</p>
+            <footer><b>Архитектор</b><span>Пример отзыва, заменить на реальный</span></footer>
+          </article>
+        </div>
+        <div class="trust-docs">
+          <button type="button" class="btn btn-outline" id="trustTechPdf">Техкарта PDF</button>
+          <button type="button" class="btn btn-outline" id="trustPricePdf">Прайс PDF</button>
+          <span>Сертификаты и реальные отзывы добавим после согласования с вами</span>
         </div>
       </div>
     </section>
@@ -565,6 +689,9 @@
               <label for="leadVolume">Объём, м² / комментарий</label>
               <textarea id="leadVolume" rows="3" placeholder="Например: 12 м², коллекция камень"></textarea>
             </div>
+            <div class="hp-field" aria-hidden="true">
+              <label>Не заполняйте это поле<input type="text" id="leadHp" tabindex="-1" autocomplete="off"></label>
+            </div>
             <label class="consent">
               <input type="checkbox" id="leadConsent" required>
               <span>Согласен на <a href="privacy.html" target="_blank" rel="noopener">обработку персональных данных</a></span>
@@ -626,6 +753,6 @@
     <a href="https://t.me/" class="btn btn-outline" target="_blank" rel="noopener">Telegram</a>
   </div>
 
-  <script src="script.js?v=10"></script>
+  <script src="script.js?v=12"></script>
 </body>
 </html>

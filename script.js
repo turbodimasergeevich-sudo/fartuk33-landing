@@ -15,7 +15,9 @@
   реальную себестоимость/цену перед запуском.
 */
 const CONFIG = {
-  counterId: 0,                 // Yandex Metrica ID, 0 = выключен
+  // TODO(METRICA): замените 0 на номер счётчика Яндекс.Метрики.
+  // Пока стоит 0 — цели только пишутся в консоль как [metrica stub].
+  counterId: 0,                 // 0 = заглушка, например 98765432 = боевой счётчик
   crmEndpoint: '',              // URL приёма заявок (AmoCRM / Bitrix24 / свой API)
 
   waste: 0.07,                  // запас на подрезку, 7%
@@ -77,7 +79,10 @@ const escapeHtml = (s) => String(s).replace(/[&<>"']/g, (c) =>
   ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 
 function trackGoal(name) {
-  if (!CONFIG.counterId) return;
+  if (!CONFIG.counterId) {
+    console.info('[metrica stub]', name);
+    return;
+  }
   if (typeof window.ym === 'function') window.ym(CONFIG.counterId, 'reachGoal', name);
   window.dataLayer = window.dataLayer || [];
   window.dataLayer.push({ event: name });
@@ -181,14 +186,35 @@ function renderCalc() {
   return { d, r };
 }
 
+const CALC_STATE_KEY = 'fartuk33_calc_state';
 const calcInputs = $$('#width, #height, #panels, #collection, #clientType, #city, #corners, #cutouts');
-calcInputs.forEach((el) => el.addEventListener('input', renderCalc));
+
+function saveCalcState() {
+  try { sessionStorage.setItem(CALC_STATE_KEY, JSON.stringify(readCalc())); }
+  catch (e) { /* сессия недоступна */ }
+}
+function restoreCalcState() {
+  try {
+    const saved = JSON.parse(sessionStorage.getItem(CALC_STATE_KEY) || 'null');
+    if (!saved) return;
+    Object.keys(saved).forEach((key) => {
+      const el = $('#' + key);
+      if (el && saved[key] !== undefined) el.value = saved[key];
+    });
+  } catch (e) { /* игнорируем битые данные */ }
+}
+restoreCalcState();
+calcInputs.forEach((el) => el.addEventListener('input', () => {
+  renderCalc();
+  saveCalcState();
+}));
 renderCalc();
 
 /* ---------- Отправка заявок ---------- */
 async function sendLead(payload, source) {
   // 1) Аналитика
-  trackGoal(source === 'calculator' ? 'calc_lead' : 'form_lead');
+  const goal = source === 'calculator' ? 'calc_lead' : source === 'sample_request' ? 'sample_lead' : 'form_lead';
+  trackGoal(goal);
 
   // 2) Локальная копия (демо-режим)
   try {
@@ -216,6 +242,7 @@ async function sendLead(payload, source) {
 /* ---------- Сабмит калькулятора ---------- */
 calcForm.addEventListener('submit', async (e) => {
   e.preventDefault();
+  if ($('#calcHp').value) return;
   clearErrors(calcForm);
   $('#calcSuccess').hidden = true;
 
@@ -277,6 +304,7 @@ calcForm.addEventListener('submit', async (e) => {
 /* ---------- Сабмит формы КП ---------- */
 $('#leadForm').addEventListener('submit', async (e) => {
   e.preventDefault();
+  if ($('#leadHp').value) return;
   const form = e.target;
   clearErrors(form);
   $('#leadSuccess').hidden = true;
@@ -307,6 +335,31 @@ $('#leadForm').addEventListener('submit', async (e) => {
   btn.disabled = false;
   btn.textContent = 'Отправить запрос';
   $('#leadSuccess').hidden = false;
+});
+
+/* ---------- Заявка на образец ---------- */
+$('#sampleForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  if ($('#sampleHp').value) return;
+  const form = e.target;
+  clearErrors(form);
+  $('#sampleSuccess').hidden = true;
+  const contact = $('#sampleContact').value;
+  let bad = false;
+  if (!validContact(contact)) { setError('sampleContact', 'Укажите телефон или Telegram'); bad = true; }
+  if (!$('#sampleConsent').checked) { setError('sampleConsent', 'Нужно согласие на обработку данных'); bad = true; }
+  if (bad) return;
+  const btn = $('button[type="submit"]', form);
+  btn.disabled = true; btn.textContent = 'Отправляем...';
+  await sendLead({
+    source: 'sample_request',
+    collection: $('#sampleTexture').value,
+    city: $('#sampleCity').value.trim(),
+    address: $('#sampleAddress').value.trim(),
+    contact: contact.trim()
+  }, 'sample_request');
+  btn.disabled = false; btn.textContent = 'Запросить образец';
+  $('#sampleSuccess').hidden = false;
 });
 
 /* ---------- Мобильное меню ---------- */
@@ -583,6 +636,8 @@ $('#pricePdf').addEventListener('click', () => {
   openPrintable('Прайс-лист · 3D-фартук 33 мм', rows, 'Цены ориентировочные. Точный счёт формируется после согласования образца и партии. Укажите «Сохранить как PDF» в окне печати.');
 });
 $('#mobilePricePdf').addEventListener('click', () => $('#pricePdf').click());
+$('#trustPricePdf').addEventListener('click', () => $('#pricePdf').click());
+$('#trustTechPdf').addEventListener('click', () => $('#techPdf').click());
 $('#techPdf').addEventListener('click', () => {
   openPrintable('Техническая карта · 3D-фартук 33 мм', [
     ['Толщина', '33 мм'],

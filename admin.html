@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex,nofollow">
   <title>Заявки — 3D-фартук 33 мм</title>
   <style>
     *{box-sizing:border-box}
@@ -35,7 +36,9 @@
     .chart-box h3{font-size:13px;margin:0 0 12px;color:#5c636c;text-transform:uppercase;letter-spacing:.06em}
     #leadChart{width:100%;height:130px;display:block}
     .filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
-    .filters select{padding:9px 12px;border:1px solid #cfd3d7;border-radius:5px;font:inherit;font-size:12px;background:#fff}
+    .filters select,.filters input[type=search]{padding:9px 12px;border:1px solid #cfd3d7;border-radius:5px;font:inherit;font-size:12px;background:#fff}
+    .filters input[type=search]{flex:1;min-width:220px}
+    .btn-del{border:1px solid #e2b4b0;background:#fff;color:#b3261e;padding:5px 9px;border-radius:4px;font-size:11px;cursor:pointer}
     .note{margin-top:20px;font-size:11px;color:#8b8f94;line-height:1.5}
     @media (prefers-reduced-motion: reduce){
       .live-dot,.live.bump,.live-num.pop{animation:none}
@@ -61,6 +64,12 @@
     </div>
 
     <div class="filters">
+      <input type="search" id="leadSearch" placeholder="Поиск по компании, телефону, городу…" aria-label="Поиск по заявкам">
+      <select id="filterDate" aria-label="Фильтр по дате">
+        <option value="all">Все даты</option>
+        <option value="7">Последние 7 дней</option>
+        <option value="30">Последние 30 дней</option>
+      </select>
       <select id="filterType" aria-label="Фильтр по типу клиента">
         <option value="all">Все типы клиентов</option>
         <option value="designer">Дизайнеры</option>
@@ -72,6 +81,7 @@
         <option value="all">Все источники</option>
         <option value="landing_calculator">Калькулятор</option>
         <option value="landing_lead_form">Форма КП</option>
+        <option value="sample_request">Образцы</option>
       </select>
     </div>
 
@@ -111,10 +121,23 @@
     function filteredLeads() {
       const type = $('#filterType').value;
       const source = $('#filterSource').value;
-      return leads.filter((r) =>
-        (type === 'all' || r.clientType === type) &&
-        (source === 'all' || r.source === source)
-      );
+      const days = $('#filterDate').value;
+      const query = $('#leadSearch').value.trim().toLowerCase();
+      const cutoff = days === 'all' ? null : Date.now() - Number(days) * 86400000;
+      return leads.filter((r) => {
+        if (type !== 'all' && r.clientType !== type) return false;
+        if (source !== 'all' && r.source !== source) return false;
+        if (cutoff) {
+          const t = Date.parse(r.sentAt || r.timestamp || '');
+          if (!t || t < cutoff) return false;
+        }
+        if (query) {
+          const hay = [r.company, r.phone, r.contact, r.city, r.comment, r.address]
+            .filter(Boolean).join(' ').toLowerCase();
+          if (!hay.includes(query)) return false;
+        }
+        return true;
+      });
     }
 
     function drawChart() {
@@ -202,7 +225,7 @@
           : '';
         return `<tr>
           <td>${escHtml(dateOf(r))}</td>
-          <td>${r.source === 'landing_calculator' ? 'Калькулятор' : 'Форма КП'}</td>
+          <td>${(({ landing_calculator: 'Калькулятор', landing_lead_form: 'Форма КП', sample_request: 'Образец' })[r.source] || 'Заявка')}</td>
           <td>${escHtml(val(r, ['company','name']) || '—')}</td>
           <td>${escHtml(val(r, ['phone','contact']) || '—')}</td>
           <td>${escHtml(val(r, ['city']) || '—')}</td>
@@ -211,10 +234,11 @@
           <td>${r.panels ? escHtml(r.panels + ' шт.') : '—'}</td>
           <td>${r.estimatedPrice ? escHtml(r.estimatedPrice.toLocaleString('ru-RU') + ' ₽') : '—'}</td>
           <td>${escHtml(details || r.comment || '—')}</td>
+          <td><button type="button" class="btn-del" data-del="${leads.indexOf(r)}" aria-label="Удалить заявку">Удалить</button></td>
         </tr>`;
       }).join('');
       $('#tableBox').innerHTML = `<table>
-        <thead><tr><th>Дата</th><th>Источник</th><th>Компания</th><th>Телефон</th><th>Город</th><th>Тип</th><th>Площадь</th><th>Панели</th><th>Стоимость</th><th>Детали</th></tr></thead>
+        <thead><tr><th>Дата</th><th>Источник</th><th>Компания</th><th>Телефон</th><th>Город</th><th>Тип</th><th>Площадь</th><th>Панели</th><th>Стоимость</th><th>Детали</th><th></th></tr></thead>
         <tbody>${rows}</tbody>
       </table>`;
     }
@@ -285,6 +309,16 @@
 
     $('#filterType').addEventListener('change', () => render(false));
     $('#filterSource').addEventListener('change', () => render(false));
+    $('#filterDate').addEventListener('change', () => render(false));
+    $('#leadSearch').addEventListener('input', () => render(false));
+    $('#tableBox').addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-del]');
+      if (!btn) return;
+      if (!confirm('Удалить эту заявку?')) return;
+      leads.splice(Number(btn.dataset.del), 1);
+      localStorage.setItem(KEY, JSON.stringify(leads));
+      render(true);
+    });
     window.addEventListener('resize', () => drawChart());
     render();
 
