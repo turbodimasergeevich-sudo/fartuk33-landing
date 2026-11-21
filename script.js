@@ -282,7 +282,7 @@ renderCalc();
 /* ---------- Отправка заявок ---------- */
 async function sendLead(payload, source) {
   // 1) Аналитика
-  const goal = source === 'calculator' ? 'calc_lead' : source === 'sample_request' ? 'sample_lead' : 'form_lead';
+  const goal = source === 'landing_calculator' ? 'calc_lead' : source === 'sample_request' ? 'sample_lead' : 'form_lead';
   trackGoal(goal);
 
   // 2) Локальная копия (демо-режим)
@@ -361,7 +361,7 @@ calcForm.addEventListener('submit', async (e) => {
     company: $('#calcCompany').value.trim()
   };
 
-  await sendLead(payload, 'calculator');
+  await sendLead(payload, 'landing_calculator');
 
   btn.disabled = false;
   btn.textContent = 'Отправить запрос';
@@ -402,7 +402,7 @@ $('#leadForm').addEventListener('submit', async (e) => {
     city: $('#leadCity').value.trim(),
     contact: contact.trim(),
     comment: $('#leadVolume').value.trim()
-  }, 'form');
+  }, 'landing_lead_form');
 
   btn.disabled = false;
   btn.textContent = 'Отправить запрос';
@@ -835,7 +835,11 @@ function baFromEvent(e) {
   const rect = baSlider.getBoundingClientRect();
   setBaPosition(((e.clientX - rect.left) / rect.width) * 100);
 }
-baSlider.addEventListener('pointerdown', (e) => { baDragging = true; baSlider.setPointerCapture(e.pointerId); baFromEvent(e); });
+baSlider.addEventListener('pointerdown', (e) => {
+  baDragging = true;
+  try { baSlider.setPointerCapture(e.pointerId); } catch (err) { /* синтетические события */ }
+  baFromEvent(e);
+});
 baSlider.addEventListener('pointermove', (e) => { if (baDragging) baFromEvent(e); });
 baSlider.addEventListener('pointerup', () => { baDragging = false; });
 baSlider.addEventListener('pointercancel', () => { baDragging = false; });
