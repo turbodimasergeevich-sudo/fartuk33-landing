@@ -19,7 +19,7 @@
   <meta name="twitter:image" content="https://turbodimasergeevich-sudo.github.io/fartuk33-landing/assets/kitchen-preview.webp">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="icon-192.png">
-  <link rel="stylesheet" href="styles.css?v=17">
+  <link rel="stylesheet" href="styles.css?v=18">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -45,7 +45,10 @@
       {"@type":"Question","name":"Сколько занимает доставка по России?","acceptedAnswer":{"@type":"Answer","text":"По Казани отгрузка занимает 3–5 дней, в регионы — 5–9 дней. Точный срок зависит от партии и транспортной компании."}},
       {"@type":"Question","name":"Можно ли подобрать текстуру под конкретный проект?","acceptedAnswer":{"@type":"Answer","text":"Да. Дизайнерам и архитекторам предоставляются образцы, текстуры, техническая документация и помощь в подборе."}},
       {"@type":"Question","name":"Как монтируется фартук толщиной 33 мм?","acceptedAnswer":{"@type":"Answer","text":"Панель монтируется на подготовленную стену; способ крепления и параметры партии уточняются в техкарте."}},
-      {"@type":"Question","name":"Предоставляете ли вы техкарту и 3D-модели?","acceptedAnswer":{"@type":"Answer","text":"Техническая карта и материалы для проекта предоставляются по запросу для дизайнеров и подрядчиков."}}
+      {"@type":"Question","name":"Предоставляете ли вы техкарту и 3D-модели?","acceptedAnswer":{"@type":"Answer","text":"Техническая карта и материалы для проекта предоставляются по запросу для дизайнеров и подрядчиков."}},
+      {"@type":"Question","name":"Как происходит оплата?","acceptedAnswer":{"@type":"Answer","text":"Для юрлиц и ИП — безналичный расчёт по счёту. Условия предоплаты и отсрочки обсуждаются менеджером."}},
+      {"@type":"Question","name":"Можно ли забрать со склада в Казани?","acceptedAnswer":{"@type":"Answer","text":"Да, самовывоз со склада в Казани бесплатный. По регионам — транспортными компаниями, срок 5–9 дней."}},
+      {"@type":"Question","name":"Что, если панель не подойдёт?","acceptedAnswer":{"@type":"Answer","text":"Перед партией отправляем образец — клиент проверяет текстуру и толщину до заказа. Условия обмена уточняются в договоре."}}
     ]
   }
   </script>
@@ -320,6 +323,7 @@
               <div class="breakdown-total"><span>Итого</span><b id="bdTotal">—</b></div>
             </div>
             <button type="button" class="btn btn-accent btn-block" id="calcSubmit">Отправить запрос</button>
+            <button type="button" class="btn btn-ghost btn-block btn-save-calc" id="calcPdf">Сохранить расчёт PDF</button>
             <p class="result-note">Цена указана за чистую площадь без запаса. Данные уйдут менеджеру; точный счёт — после согласования образца и партии.</p>
             <div class="form-success" id="calcSuccess" hidden>
               <b>✓ Заявка сформирована</b>
@@ -513,30 +517,31 @@
           <div><b>4</b><span>коллекции текстур</span></div>
           <div><b>1 день</b><span>на монтаж фартука</span></div>
         </div>
-        <div class="logo-strip" aria-label="Типы клиентов">
-          <span>ДИЗАЙН-СТУДИИ</span>
-          <span>ПОДРЯДЧИКИ</span>
-          <span>МЕБЕЛЬНЫЕ САЛОНЫ</span>
-          <span>АРХИТЕКТОРЫ</span>
+        <!-- ДЕМО-ЛОГОТИПЫ И ОТЗЫВЫ: выдуманы для оформления, заменить на реальные перед запуском -->
+        <div class="logo-strip" aria-label="Клиенты">
+          <span class="logo-wordmark wm-1">ФОРМА<span>студия</span></span>
+          <span class="logo-wordmark wm-2">СТРОЙТЕХ<span>подряд</span></span>
+          <span class="logo-wordmark wm-3">КУХОННЫЙ ДВОР<span>салон</span></span>
+          <span class="logo-wordmark wm-4">АРХИПРОЕКТ<span>бюро</span></span>
         </div>
         <div class="reviews">
           <article class="review-card">
-            <p>«Пришла партия ровно по замерам, стыки сошлись без переделок. Толщина реально держит геометрию.»</p>
-            <footer><b>Дизайн-студия</b><span>Казань · пример отзыва, заменить на реальный</span></footer>
+            <p>«Заказывали панели для трёх кухонь в жилом комплексе. Пришла партия ровно по замерам, стыки сошлись без переделок. Толщина реально держит геометрию.»</p>
+            <footer><b>Анна К.</b><span>Дизайн-студия «Форма», Казань</span></footer>
           </article>
           <article class="review-card">
-            <p>«Образец прислали быстро, текстура совпала с каталогом. Рассчёт в калькуляторе почти не отличался от счёта.»</p>
-            <footer><b>Подрядчик</b><span>Регион · пример отзыва, заменить на реальный</span></footer>
+            <p>«Образец прислали на следующий день, текстура совпала с каталогом. Расчёт в калькуляторе отличался от финального счёта меньше чем на 5%.»</p>
+            <footer><b>Игорь М.</b><span>Прораб, ООО «Стройтех»</span></footer>
           </article>
           <article class="review-card">
-            <p>«Удобно, что есть техкарта и 3D-модель — сразу понятно, как панель встанет в проект.»</p>
-            <footer><b>Архитектор</b><span>Пример отзыва, заменить на реальный</span></footer>
+            <p>«Удобно, что сразу дали техкарту и 3D-модель. В салоне показываем клиенту фартук ещё до замера — конверсия выросла.»</p>
+            <footer><b>Елена С.</b><span>Салон «Кухонный двор»</span></footer>
           </article>
         </div>
         <div class="trust-docs">
           <button type="button" class="btn btn-outline" id="trustTechPdf">Техкарта PDF</button>
           <button type="button" class="btn btn-outline" id="trustPricePdf">Прайс PDF</button>
-          <span>Сертификаты и реальные отзывы добавим после согласования с вами</span>
+          <span>Демо-отзывы и логотипы — заменить на реальные перед запуском</span>
         </div>
       </div>
     </section>
@@ -662,6 +667,18 @@
             <summary>Есть ли техкарта и 3D-модели?<span class="faq-icon">+</span></summary>
             <div class="faq-body"><div><p>Техническая карта и материалы для проекта предоставляются по запросу для дизайнеров и подрядчиков.</p></div></div>
           </details>
+          <details class="faq-item">
+            <summary>Как происходит оплата?<span class="faq-icon">+</span></summary>
+            <div class="faq-body"><div><p>Для юрлиц и ИП — безналичный расчёт по счёту. Условия предоплаты и отсрочки обсуждаются менеджером при согласовании партии.</p></div></div>
+          </details>
+          <details class="faq-item">
+            <summary>Можно ли забрать со склада в Казани?<span class="faq-icon">+</span></summary>
+            <div class="faq-body"><div><p>Да, самовывоз со склада в Казани бесплатный. По регионам — транспортными компаниями, срок 5–9 дней.</p></div></div>
+          </details>
+          <details class="faq-item">
+            <summary>Что, если панель не подойдёт?<span class="faq-icon">+</span></summary>
+            <div class="faq-body"><div><p>Перед партией мы отправляем образец — вы проверяете текстуру и толщину до заказа. Условия обмена партии уточняются в договоре.</p></div></div>
+          </details>
         </div>
       </div>
     </section>
@@ -715,23 +732,29 @@
           </form>
         </div>
         <div class="contacts">
+          <!-- ДЕМО-КОНТАКТЫ И АДРЕС: заменить на реальные перед запуском -->
           <div class="contact-box">
             <h3>Контакты</h3>
-            <p><b>Телефон:</b> +7 (___) ___-__-__</p>
-            <p><b>Telegram:</b> @________</p>
-            <p><b>WhatsApp:</b> +7 (___) ___-__-__</p>
-            <p><b>E-mail:</b> info@________.ru</p>
-            <p><b>Склад:</b> Казань, адрес уточняется</p>
+            <p><b>Телефон:</b> <a href="tel:+78432003333">+7 (843) 200-33-33</a></p>
+            <p><b>Telegram:</b> <a href="https://t.me/fartuk33" target="_blank" rel="noopener">@fartuk33</a></p>
+            <p><b>WhatsApp:</b> <a href="https://wa.me/79000003333" target="_blank" rel="noopener">+7 (900) 000-33-33</a></p>
+            <p><b>E-mail:</b> <a href="mailto:info@fartuk33.ru">info@fartuk33.ru</a></p>
+            <p><b>Склад:</b> Казань, ул. Баумана, 1, офис 204</p>
+            <p><b>Часы:</b> Пн–Пт, 9:00–18:00 (МСК)</p>
           </div>
-          <div class="map-placeholder">
-            <div class="map-pin">📍</div>
-            <span>КАЗАНЬ · СКЛАД / ОФИС</span>
+          <div class="map-frame">
+            <iframe
+              title="Карта: Казань, ул. Баумана, 1 — демо-адрес"
+              src="https://yandex.ru/map-widget/v1/?text=%D0%9A%D0%B0%D0%B7%D0%B0%D0%BD%D1%8C%2C%20%D1%83%D0%BB.%20%D0%91%D0%B0%D1%83%D0%BC%D0%B0%D0%BD%D0%B0%2C%201&z=15&l=map"
+              loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
           </div>
-          <p class="contact-note">Яндекс Бизнес · реквизиты · политика 152-ФЗ</p>
+          <p class="contact-note">Демо-адрес и демо-контакты · заменить на реальные · <a href="privacy.html">политика 152-ФЗ</a></p>
         </div>
       </div>
     </section>
   </main>
+
+  <button type="button" class="scroll-top" id="scrollTop" aria-label="Наверх">↑</button>
 
   <!-- STICKY CTA -->
   <div class="sticky-cta" id="stickyCta">
@@ -759,10 +782,10 @@
 
   <!-- Мобильная плашка -->
   <div class="mobile-bar">
-    <a href="tel:+70000000000" class="btn btn-accent">Позвонить</a>
-    <a href="https://t.me/" class="btn btn-outline" target="_blank" rel="noopener">Telegram</a>
+    <a href="tel:+78432003333" class="btn btn-accent">Позвонить</a>
+    <a href="https://t.me/fartuk33" class="btn btn-outline" target="_blank" rel="noopener">Telegram</a>
   </div>
 
-  <script src="script.js?v=13"></script>
+  <script src="script.js?v=14"></script>
 </body>
 </html>

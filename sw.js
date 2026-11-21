@@ -1,4 +1,4 @@
-const CACHE = 'fartuk33-v4';
+const CACHE = 'fartuk33-v5';
 const ASSETS = [
   './index.html',
   './admin.html',

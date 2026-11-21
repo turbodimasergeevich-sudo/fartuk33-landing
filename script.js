@@ -615,9 +615,13 @@ function onScroll() {
     updateProgress();
     updateSticky();
     checkBars();
+    $('#scrollTop').classList.toggle('visible', window.scrollY > 700);
     scrollQueued = false;
   });
 }
+$('#scrollTop').addEventListener('click', () => {
+  window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
+});
 window.addEventListener('scroll', onScroll, { passive: true });
 window.addEventListener('resize', () => { measurePage(); checkBars(); });
 measurePage();
@@ -662,6 +666,22 @@ $('#pricePdf').addEventListener('click', () => {
 $('#mobilePricePdf').addEventListener('click', () => $('#pricePdf').click());
 $('#trustPricePdf').addEventListener('click', () => $('#pricePdf').click());
 $('#trustTechPdf').addEventListener('click', () => $('#techPdf').click());
+$('#calcPdf').addEventListener('click', () => {
+  const d = readCalc();
+  const r = compute(d);
+  openPrintable('Расчёт стоимости · 3D-фартук 33 мм', [
+    ['Размер фартука', `${d.width} × ${d.height} м`],
+    ['Площадь', fmt(r.area, 2) + ' м²'],
+    ['С запасом на подрезку', fmt(r.areaWithWaste, 2) + ' м²'],
+    ['Панелей 33 мм', r.panels + ' шт.'],
+    ['Коллекция', COLLECTION_NAMES[d.collection] || d.collection],
+    ['Тип клиента', CLIENT_NAMES[d.clientType] || d.clientType],
+    ['Углы / вырезы', `${d.corners} / ${d.cutouts} шт.`],
+    ['Город доставки', d.city === 'kazan' ? 'Казань' : 'Другой город РФ'],
+    ['Срок отгрузки', r.term],
+    ['Ориентировочная стоимость', fmtMoney(r.price)]
+  ], 'Расчёт ориентировочный. Точный счёт — после согласования образца и партии.');
+});
 $('#techPdf').addEventListener('click', () => {
   openPrintable('Техническая карта · 3D-фартук 33 мм', [
     ['Толщина', '33 мм'],
