@@ -41,6 +41,56 @@ const CONFIG = {
   term: { kazan: '3–5 дней', region: '5–9 дней' }
 };
 
+/* ---------- Счётчики доверия ---------- */
+function animateCountUp(el) {
+  const to = Number(el.dataset.to || 0);
+  const finish = () => { el.textContent = to; };
+  if (reduceMotion) { finish(); return; }
+  const start = performance.now();
+  let finished = false;
+  const tick = (now) => {
+    if (finished) return;
+    const p = Math.min(1, (now - start) / 900);
+    el.textContent = Math.round(to * (1 - Math.pow(1 - p, 3)));
+    if (p < 1) requestAnimationFrame(tick);
+    else { finished = true; finish(); }
+  };
+  requestAnimationFrame(tick);
+  setTimeout(() => { if (!finished) { finished = true; finish(); } }, 1000);
+}
+let countersDone = false;
+function checkCounters() {
+  if (countersDone) return;
+  const block = $('#trust');
+  if (!block) return;
+  const rect = block.getBoundingClientRect();
+  if (rect.top < window.innerHeight * 0.9 && rect.bottom > 0) {
+    $$('.count-up', block).forEach(animateCountUp);
+    countersDone = true;
+  }
+}
+
+/* ---------- Ленивый 3D-просмотр GLB ---------- */
+let mvLoading = false;
+function checkModelViewer() {
+  if (mvLoading) return;
+  const section = $('#viewer');
+  const model = $('.mv-model');
+  if (!section || !model) return;
+  const rect = section.getBoundingClientRect();
+  if (rect.top > window.innerHeight + 200 || rect.bottom < -200) return;
+  mvLoading = true;
+  const script = document.createElement('script');
+  script.type = 'module';
+  script.src = 'https://cdnjs.cloudflare.com/ajax/libs/model-viewer/4.4.0/model-viewer.min.js';
+  script.onload = () => {
+    model.hidden = false;
+    const poster = $('.mv-poster');
+    if (poster) poster.hidden = true;
+  };
+  document.head.appendChild(script);
+}
+
 /* ---------- Яндекс.Метрика (подключается по ID из CONFIG) ---------- */
 function initMetrika(id) {
   if (!id) return;
@@ -317,6 +367,9 @@ calcForm.addEventListener('submit', async (e) => {
   btn.textContent = 'Отправить запрос';
   $('#calcSuccessText').textContent =
     `${fmt(r.area)} м² · ${r.panels} шт. · ${fmtMoney(r.price)}. Менеджер уточнит счёт.`;
+  const message = `Здравствуйте! Интересует 3D-фартук 33 мм. Размер ${d.width}×${d.height} м, площадь ${fmt(r.area)} м², коллекция ${COLLECTION_NAMES[d.collection] || d.collection}, тип клиента ${CLIENT_NAMES[d.clientType] || d.clientType}, город ${d.city === 'kazan' ? 'Казань' : 'другой город РФ'}. Ориентировочная стоимость ${fmtMoney(r.price)}. Прошу КП и образец.`;
+  $('#shareTg').href = 'https://t.me/share/url?url=' + encodeURIComponent(location.href.split('?')[0]) + '&text=' + encodeURIComponent(message);
+  $('#shareWa').href = 'https://wa.me/?text=' + encodeURIComponent(message);
   $('#calcSuccess').hidden = false;
 });
 
@@ -454,6 +507,8 @@ function measurePage() {
   stickyHideFrom = lead.offsetTop - 200;
   updateProgress();
   updateSticky();
+  checkCounters();
+  checkModelViewer();
 }
 
 /* ---------- Анимация полос сравнения ---------- */
@@ -624,6 +679,8 @@ function onScroll() {
     updateProgress();
     updateSticky();
     checkBars();
+    checkCounters();
+    checkModelViewer();
     $('#scrollTop').classList.toggle('visible', window.scrollY > 700);
     scrollQueued = false;
   });
@@ -737,18 +794,55 @@ $('#a11yToggle').addEventListener('click', (e) => {
   body.hidden = !body.hidden;
   e.currentTarget.setAttribute('aria-expanded', String(!body.hidden));
 });
+const fontSteps = [0.875, 1, 1.125, 1.25];
+let fontStep = 1;
+function applyFontScale() {
+  document.documentElement.style.fontSize = (fontSteps[fontStep] * 100) + '%';
+}
+applyFontScale();
+
 $$('#a11yBody [data-a11y]').forEach((btn) => {
   btn.addEventListener('click', () => {
     const action = btn.dataset.a11y;
     if (action === 'reset') {
       document.body.classList.remove('a11y-contrast', 'a11y-noimages');
+      fontStep = 1;
+      applyFontScale();
       $$('#a11yBody [aria-pressed]').forEach((b) => b.setAttribute('aria-pressed', 'false'));
+      return;
+    }
+    if (action === 'font-down' || action === 'font-up') {
+      fontStep = Math.max(0, Math.min(fontSteps.length - 1, fontStep + (action === 'font-up' ? 1 : -1)));
+      applyFontScale();
       return;
     }
     const cls = action === 'contrast' ? 'a11y-contrast' : 'a11y-noimages';
     const active = document.body.classList.toggle(cls);
     btn.setAttribute('aria-pressed', String(active));
   });
+});
+
+/* ---------- Before / After слайдер ---------- */
+const baSlider = $('#baSlider');
+const baHandle = $('#baHandle');
+function setBaPosition(pos) {
+  const value = Math.max(0, Math.min(100, pos));
+  baSlider.style.setProperty('--pos', value + '%');
+  baHandle.setAttribute('aria-valuenow', String(Math.round(value)));
+}
+let baDragging = false;
+function baFromEvent(e) {
+  const rect = baSlider.getBoundingClientRect();
+  setBaPosition(((e.clientX - rect.left) / rect.width) * 100);
+}
+baSlider.addEventListener('pointerdown', (e) => { baDragging = true; baSlider.setPointerCapture(e.pointerId); baFromEvent(e); });
+baSlider.addEventListener('pointermove', (e) => { if (baDragging) baFromEvent(e); });
+baSlider.addEventListener('pointerup', () => { baDragging = false; });
+baSlider.addEventListener('pointercancel', () => { baDragging = false; });
+baHandle.addEventListener('keydown', (e) => {
+  const step = e.shiftKey ? 10 : 2;
+  if (e.key === 'ArrowLeft') { setBaPosition(Number(baHandle.getAttribute('aria-valuenow')) - step); e.preventDefault(); }
+  if (e.key === 'ArrowRight') { setBaPosition(Number(baHandle.getAttribute('aria-valuenow')) + step); e.preventDefault(); }
 });
 
 /* ---------- A/B-тест первого экрана ---------- */

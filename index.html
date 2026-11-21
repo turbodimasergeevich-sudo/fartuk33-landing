@@ -20,7 +20,7 @@
   <link rel="icon" href="icon-32.png" sizes="32x32" type="image/png">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="icon-192.png">
-  <link rel="stylesheet" href="styles.css?v=25">
+  <link rel="stylesheet" href="styles.css?v=26">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -330,6 +330,10 @@
             <div class="form-success" id="calcSuccess" hidden>
               <b>✓ Заявка сформирована</b>
               <span id="calcSuccessText"></span>
+              <div class="lead-share" id="leadShare">
+                <a id="shareTg" target="_blank" rel="noopener">Telegram</a>
+                <a id="shareWa" target="_blank" rel="noopener">WhatsApp</a>
+              </div>
             </div>
           </aside>
         </div>
@@ -467,7 +471,10 @@
       </div>
       <div class="container asset-gallery">
         <figure class="asset-card">
-          <img src="assets/wall-panel-preview.webp" alt="3D-модель декоративной настенной панели" loading="lazy">
+          <div class="mv-wrap">
+            <img class="mv-poster" src="assets/wall-panel-preview.webp" alt="3D-модель декоративной настенной панели" loading="lazy">
+            <model-viewer class="mv-model" src="assets/wall-panel.glb" poster="assets/wall-panel-preview.webp" alt="Интерактивная 3D-модель панели" camera-controls auto-rotate shadow-intensity="1" hidden></model-viewer>
+          </div>
           <figcaption>
             <b>Панель · 3D-модель</b>
             <span>2 268 треугольников · 1,2 × 0,09 × 2,4 м</span>
@@ -517,10 +524,10 @@
           <h2>С кем работаем и что подтверждаем</h2>
         </div>
         <div class="trust-stats">
-          <div><b>33 мм</b><span>рабочая толщина панели</span></div>
-          <div><b>3–9 дней</b><span>отгрузка по России</span></div>
-          <div><b>4</b><span>коллекции текстур</span></div>
-          <div><b>1 день</b><span>на монтаж фартука</span></div>
+          <div><b><span class="count-up" data-to="33">0</span> мм</b><span>рабочая толщина панели</span></div>
+          <div><b>3–<span class="count-up" data-to="9">0</span> дней</b><span>отгрузка по России</span></div>
+          <div><b><span class="count-up" data-to="4">0</span></b><span>коллекции текстур</span></div>
+          <div><b><span class="count-up" data-to="1">0</span> день</b><span>на монтаж фартука</span></div>
         </div>
         <!-- ДЕМО-ЛОГОТИПЫ И ОТЗЫВЫ: выдуманы для оформления, заменить на реальные перед запуском -->
         <div class="logo-strip" aria-label="Клиенты">
@@ -643,6 +650,43 @@
       </div>
     </section>
 
+    <!-- BEFORE / AFTER -->
+    <section class="section section-light" id="beforeafter">
+      <div class="container">
+        <div class="section-head center">
+          <div class="eyebrow">Наглядно</div>
+          <h2>Тонкий фартук и панель 33 мм</h2>
+          <p class="section-sub">Потяните ползунок — слева тонкая панель, справа жёсткий модуль 33 мм.</p>
+        </div>
+        <div class="ba-slider" id="baSlider" style="--pos:50%">
+          <div class="ba-layer ba-after texture-stone"></div>
+          <div class="ba-layer ba-before texture-concrete"></div>
+          <div class="ba-handle" id="baHandle" role="slider" tabindex="0" aria-label="Сравнение фартуков" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50">⇄</div>
+          <span class="ba-label ba-label-left">ТОНКИЙ · 3 мм</span>
+          <span class="ba-label ba-label-right">НАШ · 33 мм</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- GUIDE -->
+    <section class="section" id="guide">
+      <div class="container guide-grid">
+        <div>
+          <div class="eyebrow">Гайд</div>
+          <h2>Как выбрать фартук на кухню: 5 критериев</h2>
+          <p>Короткий чек-лист для дизайнеров и подрядчиков — чтобы не переделывать объект после монтажа.</p>
+          <a href="#calculator" class="btn btn-accent">Подобрать свой вариант</a>
+        </div>
+        <ol class="guide-list">
+          <li><b>Толщина и жёсткость</b><span>Панель должна держать геометрию: 33 мм не коробится на стене.</span></li>
+          <li><b>Текстура и свет</b><span>Смотрите образец при дневном свете — рисунок на экране обманчив.</span></li>
+          <li><b>Стыки и замеры</b><span>Уточняйте размеры панелей заранее: точные стыки экономят день монтажа.</span></li>
+          <li><b>Термо- и влагостойкость</b><span>Запросите техкарту до заказа, особенно для зоны плиты.</span></li>
+          <li><b>Сроки поставки</b><span>Планируйте отгрузку с запасом: Казань 3–5 дней, регионы 5–9.</span></li>
+        </ol>
+      </div>
+    </section>
+
     <!-- FAQ -->
     <section class="section section-light" id="faq">
       <div class="container faq-grid">
@@ -762,6 +806,8 @@
   <div class="a11y-panel" id="a11yPanel">
     <button type="button" class="a11y-toggle" id="a11yToggle" aria-label="Настройки доступности" aria-expanded="false">♿</button>
     <div class="a11y-body" id="a11yBody" hidden>
+      <button type="button" data-a11y="font-down" aria-label="Уменьшить текст">A−</button>
+      <button type="button" data-a11y="font-up" aria-label="Увеличить текст">A+</button>
       <button type="button" data-a11y="contrast" aria-pressed="false">Контраст</button>
       <button type="button" data-a11y="images" aria-pressed="false">Без картинок</button>
       <button type="button" data-a11y="reset">Сброс</button>
@@ -800,6 +846,6 @@
     <a href="https://t.me/fartuk33" class="btn btn-outline" target="_blank" rel="noopener">Telegram</a>
   </div>
 
-  <script src="script.js?v=17"></script>
+  <script src="script.js?v=19"></script>
 </body>
 </html>
