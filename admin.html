@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Заявки — 3D-фартук 33 мм</title>
+  <style>
+    *{box-sizing:border-box}
+    body{margin:0;padding:32px;background:#eef0f2;color:#161A1F;font-family:"Segoe UI",Arial,sans-serif}
+    .wrap{max-width:1200px;margin:0 auto;background:#fff;border:1px solid #d8dce0;border-radius:8px;padding:28px}
+    h1{font-size:24px;margin:0 0 6px}
+    .sub{color:#6b7178;font-size:13px;margin-bottom:22px}
+    .bar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;align-items:center}
+    .btn{border:1px solid #161A1F;background:#fff;padding:10px 16px;border-radius:5px;cursor:pointer;font:inherit;font-weight:600}
+    .btn.primary{background:#D9683C;border-color:#D9683C;color:#fff}
+    .btn.danger{color:#b3261e;border-color:#e2b4b0}
+    .count{font-size:13px;color:#5c636c;margin-left:auto}
+    table{width:100%;border-collapse:collapse;font-size:12px}
+    th,td{border-bottom:1px solid #e4e7ea;padding:10px 8px;text-align:left;vertical-align:top}
+    th{background:#f6f7f8;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:#6b7178}
+    td small{display:block;color:#8b8f94;margin-top:3px}
+    .empty{padding:40px;text-align:center;color:#8b8f94;border:1px dashed #c9ced3;border-radius:6px}
+    .note{margin-top:20px;font-size:11px;color:#8b8f94;line-height:1.5}
+    code{background:#f2f4f6;padding:2px 5px;border-radius:3px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Заявки с лендинга</h1>
+    <div class="sub">Демо-режим: заявки хранятся в браузере (<code>localStorage</code>). Для боевого режима укажите <code>crmEndpoint</code> в <code>script.js</code>.</div>
+
+    <div class="bar">
+      <button class="btn primary" id="exportCsv">Скачать CSV (Excel)</button>
+      <button class="btn" id="exportXls">Скачать XLS</button>
+      <button class="btn" id="exportJson">Скачать JSON</button>
+      <button class="btn danger" id="clearAll">Очистить</button>
+      <span class="count" id="count"></span>
+    </div>
+
+    <div id="tableBox"></div>
+
+    <div class="note">
+      CSV — с BOM и разделителем «;», открывается в Excel без проблем с кириллицей.<br>
+      Чтобы попасть сюда с лендинга, добавьте к адресу <code>?admin=1</code> — появится плавающая кнопка «Админ: заявки».
+    </div>
+  </div>
+
+  <script>
+    const KEY = 'fartuk33_leads';
+    const $ = (s) => document.querySelector(s);
+
+    function load() {
+      try { return JSON.parse(localStorage.getItem(KEY) || '[]'); }
+      catch (e) { return []; }
+    }
+    let leads = load();
+
+    function val(row, keys) {
+      for (const k of keys) if (row[k] !== undefined && row[k] !== null && row[k] !== '') return row[k];
+      return '';
+    }
+    function dateOf(row) {
+      const d = row.sentAt || row.timestamp;
+      if (!d) return '—';
+      try { return new Date(d).toLocaleString('ru-RU'); } catch (e) { return String(d); }
+    }
+    function typeName(v) {
+      return ({ designer:'Дизайнер', contractor:'Подрядчик', dealer:'Дилер', retail:'Частное лицо' })[v] || v || '—';
+    }
+
+    function render() {
+      $('#count').textContent = `Заявок: ${leads.length}`;
+      if (!leads.length) {
+        $('#tableBox').innerHTML = '<div class="empty">Заявок пока нет. Отправьте тестовую заявку с лендинга.</div>';
+        return;
+      }
+      const rows = leads.slice().reverse().map((r) => {
+        const opts = r.options || {};
+        return `<tr>
+          <td>${dateOf(r)}</td>
+          <td>${r.source === 'landing_calculator' ? 'Калькулятор' : 'Форма КП'}</td>
+          <td>${val(r, ['company','name']) || '—'}</td>
+          <td>${val(r, ['phone','contact']) || '—'}</td>
+          <td>${val(r, ['city']) || '—'}</td>
+          <td>${typeName(r.clientType)}</td>
+          <td>${r.area ? r.area + ' м²' : (r.comment || '—')}</td>
+          <td>${r.panels ? r.panels + ' шт.' : '—'}</td>
+          <td>${r.estimatedPrice ? r.estimatedPrice.toLocaleString('ru-RU') + ' ₽' : '—'}</td>
+          <td>${opts.corners || opts.cutouts ? `углы ${opts.corners||0}, вырезы ${opts.cutouts||0}` : (r.comment || '—')}</td>
+        </tr>`;
+      }).join('');
+      $('#tableBox').innerHTML = `<table>
+        <thead><tr><th>Дата</th><th>Источник</th><th>Компания</th><th>Телефон</th><th>Город</th><th>Тип</th><th>Площадь</th><th>Панели</th><th>Стоимость</th><th>Детали</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>`;
+    }
+
+    function flat(r) {
+      const opts = r.options || {};
+      return {
+        'Дата': dateOf(r),
+        'Источник': r.source === 'landing_calculator' ? 'Калькулятор' : 'Форма КП',
+        'Компания': val(r, ['company','name']),
+        'Телефон': val(r, ['phone','contact']),
+        'Город': val(r, ['city']),
+        'Тип клиента': typeName(r.clientType),
+        'Площадь, м2': r.area || '',
+        'Панелей': r.panels || '',
+        'Стоимость, руб': r.estimatedPrice || '',
+        'Углы': opts.corners || 0,
+        'Вырезы': opts.cutouts || 0,
+        'Комментарий': val(r, ['comment']),
+        'Коллекция': val(r, ['collection']),
+        'Срок': val(r, ['term'])
+      };
+    }
+
+    function download(name, content, type) {
+      const blob = new Blob([content], { type });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = name;
+      document.body.appendChild(a); a.click(); a.remove();
+      URL.revokeObjectURL(url);
+    }
+    const esc = (v) => '"' + String(v === undefined || v === null ? '' : v).replace(/"/g, '""') + '"';
+
+    $('#exportCsv').addEventListener('click', () => {
+      if (!leads.length) return alert('Заявок пока нет');
+      const rows = leads.map(flat);
+      const head = Object.keys(rows[0]);
+      const csv = '\uFEFF' + [head.map(esc).join(';')]
+        .concat(rows.map((r) => head.map((k) => esc(r[k])).join(';')))
+        .join('\r\n');
+      download(`zayavki_${new Date().toISOString().slice(0,10)}.csv`, csv, 'text/csv;charset=utf-8');
+    });
+
+    $('#exportXls').addEventListener('click', () => {
+      if (!leads.length) return alert('Заявок пока нет');
+      const rows = leads.map(flat);
+      const head = Object.keys(rows[0]);
+      const html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel"><head><meta charset="utf-8"></head><body><table border="1"><tr>${head.map(h=>`<th>${h}</th>`).join('')}</tr>${rows.map(r=>`<tr>${head.map(k=>`<td>${r[k]}</td>`).join('')}</tr>`).join('')}</table></body></html>`;
+      download(`zayavki_${new Date().toISOString().slice(0,10)}.xls`, html, 'application/vnd.ms-excel;charset=utf-8');
+    });
+
+    $('#exportJson').addEventListener('click', () => {
+      if (!leads.length) return alert('Заявок пока нет');
+      download(`zayavki_${new Date().toISOString().slice(0,10)}.json`, JSON.stringify(leads, null, 2), 'application/json;charset=utf-8');
+    });
+
+    $('#clearAll').addEventListener('click', () => {
+      if (!confirm('Удалить все заявки из браузера?')) return;
+      localStorage.removeItem(KEY);
+      leads = [];
+      render();
+    });
+
+    render();
+  </script>
+</body>
+</html>
