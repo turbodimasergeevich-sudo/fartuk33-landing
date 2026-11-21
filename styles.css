@@ -513,7 +513,7 @@ img{max-width:100%;display:block}
 .wizard-head{margin-bottom:18px}
 .wizard-track{height:4px;background:#e4e7ea;border-radius:4px;overflow:hidden}
 .wizard-bar{height:100%;width:25%;background:var(--accent);border-radius:4px;transition:width .35s ease}
-.wizard-label{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:8px;font-weight:700}
+.wizard-label{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#5c636c;margin-top:8px;font-weight:700}
 .wiz-step{display:none;border:0;padding:0;margin:0;min-width:0}
 .wiz-step.is-active{display:block;animation:step-in .3s ease}
 @keyframes step-in{from{opacity:0;transform:translateX(8px)}to{opacity:1;transform:none}}
@@ -536,7 +536,7 @@ img{max-width:100%;display:block}
 .config-counter{position:absolute;left:5%;right:5%;bottom:30%;height:12px;background:linear-gradient(180deg,#4b5158,#343a41);border-radius:2px}
 .config-apron{position:absolute;left:8%;right:8%;top:30%;bottom:30%;border:1px solid rgba(0,0,0,.15);border-radius:2px;transition:opacity .25s ease,transform .25s ease}
 .config-apron.changing{opacity:0;transform:scale(.97)}
-.config-hint{text-align:center;font-size:11px;color:var(--muted);margin-top:12px;letter-spacing:.1em;text-transform:uppercase}
+.config-hint{text-align:center;font-size:11px;color:#5c636c;margin-top:12px;letter-spacing:.1em;text-transform:uppercase}
 
 /* ============ 3D VIEWER ============ */
 .viewer-grid{display:grid;grid-template-columns:.9fr 1.1fr;gap:70px;align-items:center}
