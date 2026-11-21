@@ -399,7 +399,7 @@ document.addEventListener('click', (e) => {
 /* ---------- Скрытая админ-ссылка (?admin=1) ---------- */
 if (new URLSearchParams(location.search).get('admin') === '1') {
   const link = document.createElement('a');
-  link.href = 'admin.html?v=6';
+  link.href = 'admin.html?v=7';
   link.className = 'admin-floating';
   link.textContent = 'Админ: заявки';
   document.body.appendChild(link);
@@ -710,6 +710,26 @@ if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./sw.js').catch(() => {});
   });
 }
+
+/* ---------- Панель доступности ---------- */
+$('#a11yToggle').addEventListener('click', (e) => {
+  const body = $('#a11yBody');
+  body.hidden = !body.hidden;
+  e.currentTarget.setAttribute('aria-expanded', String(!body.hidden));
+});
+$$('#a11yBody [data-a11y]').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    const action = btn.dataset.a11y;
+    if (action === 'reset') {
+      document.body.classList.remove('a11y-contrast', 'a11y-noimages');
+      $$('#a11yBody [aria-pressed]').forEach((b) => b.setAttribute('aria-pressed', 'false'));
+      return;
+    }
+    const cls = action === 'contrast' ? 'a11y-contrast' : 'a11y-noimages';
+    const active = document.body.classList.toggle(cls);
+    btn.setAttribute('aria-pressed', String(active));
+  });
+});
 
 /* ---------- A/B-тест первого экрана ---------- */
 try {

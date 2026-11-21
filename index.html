@@ -20,7 +20,7 @@
   <link rel="icon" href="icon-32.png" sizes="32x32" type="image/png">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="icon-192.png">
-  <link rel="stylesheet" href="styles.css?v=21">
+  <link rel="stylesheet" href="styles.css?v=22">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -560,7 +560,7 @@
         </div>
         <div class="table-wrap">
           <table class="compare-table">
-            <thead><tr><th>Материал</th><th>Толщина</th><th>Геометрия</th><th>Стыки</th><th>Для B2B-объекта</th></tr></thead>
+            <thead><tr><th scope="col">Материал</th><th scope="col">Толщина</th><th scope="col">Геометрия</th><th scope="col">Стыки</th><th scope="col">Для B2B-объекта</th></tr></thead>
             <tbody>
               <tr><td>Тонкий PVC / SPC</td><td>3 мм</td><td><span class="rating">●○○</span> гнётся</td><td><span class="rating">●○○</span> заметны</td><td>Ограниченно</td></tr>
               <tr><td>Керамическая плитка</td><td>8–12 мм</td><td><span class="rating">●●●</span> жёсткая</td><td><span class="rating">●○○</span> затирка</td><td>Да, но долгий монтаж</td></tr>
@@ -759,6 +759,15 @@
     </section>
   </main>
 
+  <div class="a11y-panel" id="a11yPanel">
+    <button type="button" class="a11y-toggle" id="a11yToggle" aria-label="Настройки доступности" aria-expanded="false">♿</button>
+    <div class="a11y-body" id="a11yBody" hidden>
+      <button type="button" data-a11y="contrast" aria-pressed="false">Контраст</button>
+      <button type="button" data-a11y="images" aria-pressed="false">Без картинок</button>
+      <button type="button" data-a11y="reset">Сброс</button>
+    </div>
+  </div>
+
   <button type="button" class="scroll-top" id="scrollTop" aria-label="Наверх">↑</button>
 
   <!-- STICKY CTA -->
@@ -791,6 +800,6 @@
     <a href="https://t.me/fartuk33" class="btn btn-outline" target="_blank" rel="noopener">Telegram</a>
   </div>
 
-  <script src="script.js?v=15"></script>
+  <script src="script.js?v=16"></script>
 </body>
 </html>

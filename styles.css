@@ -394,6 +394,14 @@ img{max-width:100%;display:block}
 .hero-b .hero-content h1 span{color:var(--green)}
 .hero-b .hero-badge{background:var(--green);box-shadow:0 14px 30px rgba(47,107,95,.35)}
 
+.a11y-panel{position:fixed;left:18px;bottom:18px;z-index:70;display:flex;flex-direction:column;gap:8px;align-items:flex-start}
+.a11y-toggle{width:44px;height:44px;border-radius:50%;border:1px solid var(--line-light);background:var(--dark);color:#fff;font-size:20px;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.25)}
+.a11y-body{display:flex;flex-direction:column;gap:6px;background:var(--dark);padding:10px;border-radius:8px;border:1px solid var(--line-light)}
+.a11y-body button{border:1px solid var(--line-light);background:transparent;color:#fff;font:inherit;font-size:12px;padding:8px 10px;border-radius:4px;cursor:pointer;text-align:left}
+.a11y-body button:hover,.a11y-body button[aria-pressed="true"]{background:#fff;color:#161A1F}
+body.a11y-contrast{--dark:#000;--dark-2:#000;--paper:#fff;--light:#fff;--accent:#8a2f0d;--accent-dark:#8a2f0d;--accent-strong:#6b2308;--green:#00543f;--muted:#1a1a1a;--line:#000;--line-light:#fff}
+body.a11y-noimages img,body.a11y-noimages .case-photo-1,body.a11y-noimages .case-photo-2,body.a11y-noimages .texture-stone,body.a11y-noimages .texture-wood,body.a11y-noimages .texture-concrete,body.a11y-noimages .texture-3d{visibility:hidden}
+
 .scroll-top{
   position:fixed;right:18px;bottom:80px;z-index:55;
   width:42px;height:42px;border-radius:50%;
