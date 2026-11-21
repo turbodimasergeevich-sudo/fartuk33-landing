@@ -613,6 +613,9 @@ img{max-width:100%;display:block}
 .sample-steps b{width:26px;height:26px;border-radius:50%;background:var(--accent-dark);color:#fff;display:grid;place-items:center;font-size:12px}
 .sample-form{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:30px;box-shadow:var(--shadow)}
 .sample-form .field{margin-bottom:16px}
+.sample-form .form-success{background:#e6f4ef;border-color:#9ccfc0}
+.sample-form .form-success b{color:#1d5b4a}
+.sample-form .form-success span{color:#315c50}
 
 /* ============ ДОВЕРИЕ ============ */
 .trust-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:34px}
@@ -620,15 +623,15 @@ img{max-width:100%;display:block}
 .trust-stats b{display:block;font-size:26px;color:var(--accent-strong);letter-spacing:-.02em}
 .trust-stats span{font-size:12px;color:#5c636c}
 .logo-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:34px}
-.logo-strip span{border:1px dashed #c9ced3;border-radius:5px;padding:22px 10px;text-align:center;font-size:12px;font-weight:800;letter-spacing:.08em;color:#8b8f94}
+.logo-strip span{border:1px dashed #c9ced3;border-radius:5px;padding:22px 10px;text-align:center;font-size:12px;font-weight:800;letter-spacing:.08em;color:#5c636c}
 .reviews{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
 .review-card{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:24px;margin:0}
 .review-card p{font-size:14px;font-style:italic;margin-bottom:18px}
 .review-card footer{display:flex;flex-direction:column;gap:3px}
 .review-card footer b{font-size:13px}
-.review-card footer span{font-size:11px;color:#8b8f94}
+.review-card footer span{font-size:11px;color:#5c636c}
 .trust-docs{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:26px}
-.trust-docs span{font-size:11px;color:#8b8f94}
+.trust-docs span{font-size:11px;color:#5c636c}
 
 /* ============ RESPONSIVE ============ */
 @media (max-width:1024px){
