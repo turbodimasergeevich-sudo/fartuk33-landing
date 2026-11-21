@@ -37,6 +37,9 @@
     .filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
     .filters select{padding:9px 12px;border:1px solid #cfd3d7;border-radius:5px;font:inherit;font-size:12px;background:#fff}
     .note{margin-top:20px;font-size:11px;color:#8b8f94;line-height:1.5}
+    @media (prefers-reduced-motion: reduce){
+      .live-dot,.live.bump,.live-num.pop{animation:none}
+    }
     code{background:#f2f4f6;padding:2px 5px;border-radius:3px}
   </style>
 </head>
@@ -96,6 +99,8 @@
   <script>
     const KEY = 'fartuk33_leads';
     const $ = (s) => document.querySelector(s);
+    const escHtml = (s) => String(s === undefined || s === null ? '' : s).replace(/[&<>"']/g, (c) =>
+      ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 
     function load() {
       try { return JSON.parse(localStorage.getItem(KEY) || '[]'); }
@@ -118,15 +123,16 @@
       const w = canvas.clientWidth, h = 130;
       canvas.width = w; canvas.height = h;
       ctx.clearRect(0, 0, w, h);
+      const dayKey = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
       const days = [];
       for (let i = 6; i >= 0; i--) {
         const d = new Date();
         d.setDate(d.getDate() - i);
-        days.push(d.toISOString().slice(0, 10));
+        days.push(dayKey(d));
       }
       const counts = days.map((day) => filteredLeads().filter((r) => {
-        const d = r.sentAt || r.timestamp;
-        return d && String(d).slice(0, 10) === day;
+        const raw = r.sentAt || r.timestamp;
+        return raw && dayKey(new Date(raw)) === day;
       }).length);
       const max = Math.max(1, ...counts);
       const step = w / days.length;
@@ -183,23 +189,28 @@
     function render(bump) {
       updateLive(Boolean(bump));
       drawChart();
-      if (!leads.length) {
-        $('#tableBox').innerHTML = '<div class="empty">Заявок пока нет. Отправьте тестовую заявку с лендинга.</div>';
+      const visible = filteredLeads();
+      if (!visible.length) {
+        $('#tableBox').innerHTML = '<div class="empty">Заявок по выбранному фильтру нет.</div>';
         return;
       }
-      const rows = filteredLeads().slice().reverse().map((r) => {
+      const rows = visible.slice().reverse().map((r) => {
         const opts = r.options || {};
+        const area = r.area ? `${r.area} м²` : '';
+        const details = opts.corners || opts.cutouts
+          ? `углы ${opts.corners || 0}, вырезы ${opts.cutouts || 0}`
+          : '';
         return `<tr>
-          <td>${dateOf(r)}</td>
+          <td>${escHtml(dateOf(r))}</td>
           <td>${r.source === 'landing_calculator' ? 'Калькулятор' : 'Форма КП'}</td>
-          <td>${val(r, ['company','name']) || '—'}</td>
-          <td>${val(r, ['phone','contact']) || '—'}</td>
-          <td>${val(r, ['city']) || '—'}</td>
-          <td>${typeName(r.clientType)}</td>
-          <td>${r.area ? r.area + ' м²' : (r.comment || '—')}</td>
-          <td>${r.panels ? r.panels + ' шт.' : '—'}</td>
-          <td>${r.estimatedPrice ? r.estimatedPrice.toLocaleString('ru-RU') + ' ₽' : '—'}</td>
-          <td>${opts.corners || opts.cutouts ? `углы ${opts.corners||0}, вырезы ${opts.cutouts||0}` : (r.comment || '—')}</td>
+          <td>${escHtml(val(r, ['company','name']) || '—')}</td>
+          <td>${escHtml(val(r, ['phone','contact']) || '—')}</td>
+          <td>${escHtml(val(r, ['city']) || '—')}</td>
+          <td>${escHtml(typeName(r.clientType))}</td>
+          <td>${escHtml(area || r.comment || '—')}</td>
+          <td>${r.panels ? escHtml(r.panels + ' шт.') : '—'}</td>
+          <td>${r.estimatedPrice ? escHtml(r.estimatedPrice.toLocaleString('ru-RU') + ' ₽') : '—'}</td>
+          <td>${escHtml(details || r.comment || '—')}</td>
         </tr>`;
       }).join('');
       $('#tableBox').innerHTML = `<table>
@@ -234,30 +245,34 @@
       const a = document.createElement('a');
       a.href = url; a.download = name;
       document.body.appendChild(a); a.click(); a.remove();
-      URL.revokeObjectURL(url);
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
     }
-    const esc = (v) => '"' + String(v === undefined || v === null ? '' : v).replace(/"/g, '""') + '"';
+    const escCsv = (v) => {
+      let s = String(v === undefined || v === null ? '' : v);
+      if (/^[=+\-@\t\r]/.test(s)) s = "'" + s;
+      return '"' + s.replace(/"/g, '""') + '"';
+    };
 
     $('#exportCsv').addEventListener('click', () => {
-      if (!leads.length) return alert('Заявок пока нет');
       const rows = filteredLeads().map(flat);
+      if (!rows.length) return alert('Заявок по выбранному фильтру нет');
       const head = Object.keys(rows[0]);
-      const csv = '\uFEFF' + [head.map(esc).join(';')]
-        .concat(rows.map((r) => head.map((k) => esc(r[k])).join(';')))
+      const csv = '\uFEFF' + [head.map(escCsv).join(';')]
+        .concat(rows.map((r) => head.map((k) => escCsv(r[k])).join(';')))
         .join('\r\n');
       download(`zayavki_${new Date().toISOString().slice(0,10)}.csv`, csv, 'text/csv;charset=utf-8');
     });
 
     $('#exportXls').addEventListener('click', () => {
-      if (!leads.length) return alert('Заявок пока нет');
       const rows = filteredLeads().map(flat);
+      if (!rows.length) return alert('Заявок по выбранному фильтру нет');
       const head = Object.keys(rows[0]);
-      const html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel"><head><meta charset="utf-8"></head><body><table border="1"><tr>${head.map(h=>`<th>${h}</th>`).join('')}</tr>${rows.map(r=>`<tr>${head.map(k=>`<td>${r[k]}</td>`).join('')}</tr>`).join('')}</table></body></html>`;
+      const html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel"><head><meta charset="utf-8"></head><body><table border="1"><tr>${head.map(h=>`<th>${escHtml(h)}</th>`).join('')}</tr>${rows.map(r=>`<tr>${head.map(k=>`<td>${escHtml(r[k])}</td>`).join('')}</tr>`).join('')}</table></body></html>`;
       download(`zayavki_${new Date().toISOString().slice(0,10)}.xls`, html, 'application/vnd.ms-excel;charset=utf-8');
     });
 
     $('#exportJson').addEventListener('click', () => {
-      if (!leads.length) return alert('Заявок пока нет');
+      if (!filteredLeads().length) return alert('Заявок по выбранному фильтру нет');
       download(`zayavki_${new Date().toISOString().slice(0,10)}.json`, JSON.stringify(filteredLeads(), null, 2), 'application/json;charset=utf-8');
     });
 
@@ -270,6 +285,7 @@
 
     $('#filterType').addEventListener('change', () => render(false));
     $('#filterSource').addEventListener('change', () => render(false));
+    window.addEventListener('resize', () => drawChart());
     render();
 
     function refreshFromStorage(bump) {

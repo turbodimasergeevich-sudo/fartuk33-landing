@@ -7,7 +7,8 @@
   <meta name="description" content="Жёсткие 3D-панели толщиной 33 мм для кухонь. Поставщик из Казани, отгрузка по России. Онлайн-расчёт стоимости, образцы и работа с дизайнерами.">
   <meta name="theme-color" content="#161A1F">
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="styles.css?v=9">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="stylesheet" href="styles.css?v=11">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -31,18 +32,19 @@
         <span class="logo-mark">33</span>
         <span class="logo-text">ФАРТУК<span>33 ММ</span></span>
       </a>
-      <nav class="nav" id="nav">
+      <nav class="nav" id="nav" aria-label="Основная навигация">
         <a href="#calculator">Калькулятор</a>
         <a href="#collections">Коллекции</a>
         <a href="#specs">Характеристики</a>
         <a href="#audiences">Дизайнерам</a>
         <a href="#cases">Кейсы</a>
+        <button type="button" class="nav-pdf" id="mobilePricePdf">Скачать прайс (PDF)</button>
       </nav>
       <div class="header-actions">
         <button type="button" class="btn btn-ghost" id="pricePdf">Скачать прайс</button>
         <a href="#lead" class="btn btn-accent">Получить КП</a>
       </div>
-      <button class="menu-toggle" id="menuToggle" aria-label="Открыть меню">☰</button>
+      <button class="menu-toggle" id="menuToggle" aria-label="Открыть меню" aria-expanded="false">☰</button>
     </div>
   </header>
 
@@ -247,7 +249,7 @@
               </div>
               <label class="consent">
                 <input type="checkbox" id="calcConsent" required>
-                <span>Согласен на обработку персональных данных</span>
+                <span>Согласен на <a href="privacy.html" target="_blank" rel="noopener">обработку персональных данных</a></span>
               </label>
               <small class="error" data-error="calcConsent"></small>
             </fieldset>
@@ -277,8 +279,8 @@
               <b id="resPrice">— ₽</b>
             </div>
             <div class="result-term">Срок отгрузки: <b id="resTerm">3–5 дней</b></div>
-            <button type="submit" form="calcForm" class="btn btn-accent btn-block" id="calcSubmit">Отправить запрос</button>
-            <p class="result-note">Данные уйдут менеджеру. Точный счёт — после согласования образца и партии.</p>
+            <button type="button" class="btn btn-accent btn-block" id="calcSubmit">Отправить запрос</button>
+            <p class="result-note">Цена указана за чистую площадь без запаса. Данные уйдут менеджеру; точный счёт — после согласования образца и партии.</p>
             <div class="form-success" id="calcSuccess" hidden>
               <b>✓ Заявка сформирована</b>
               <span id="calcSuccessText"></span>
@@ -375,12 +377,12 @@
         <div class="table-wrap">
           <table class="spec-table">
             <tbody>
-              <tr><th>Толщина</th><td>33 мм</td></tr>
-              <tr><th>Размер панели</th><td>уточняется</td></tr>
-              <tr><th>Вес</th><td>уточняется</td></tr>
-              <tr><th>Влагостойкость</th><td>уточняется</td></tr>
-              <tr><th>Термостойкость</th><td>уточняется</td></tr>
-              <tr><th>Способ монтажа</th><td>уточняется</td></tr>
+              <tr><th scope="row">Толщина</th><td>33 мм</td></tr>
+              <tr><th scope="row">Размер панели</th><td>уточняется</td></tr>
+              <tr><th scope="row">Вес</th><td>уточняется</td></tr>
+              <tr><th scope="row">Влагостойкость</th><td>уточняется</td></tr>
+              <tr><th scope="row">Термостойкость</th><td>уточняется</td></tr>
+              <tr><th scope="row">Способ монтажа</th><td>уточняется</td></tr>
             </tbody>
           </table>
         </div>
@@ -485,7 +487,7 @@
         <div class="section-head">
           <div class="eyebrow">Вопросы</div>
           <h2>Частые вопросы</h2>
-          <p class="section-sub" style="margin-left:0">Не нашли ответ? Отправьте запрос — менеджер ответит по вашему проекту.</p>
+          <p class="section-sub faq-sub">Не нашли ответ? Отправьте запрос — менеджер ответит по вашему проекту.</p>
         </div>
         <div class="faq-list">
           <details class="faq-item">
@@ -547,7 +549,7 @@
             </div>
             <label class="consent">
               <input type="checkbox" id="leadConsent" required>
-              <span>Согласен на обработку персональных данных</span>
+              <span>Согласен на <a href="privacy.html" target="_blank" rel="noopener">обработку персональных данных</a></span>
             </label>
             <small class="error" data-error="leadConsent"></small>
             <button type="submit" class="btn btn-accent btn-block">Отправить запрос</button>
@@ -590,13 +592,13 @@
         <span class="logo-mark">33</span>
         <span class="logo-text">ФАРТУК</span>
       </div>
-      <nav>
+      <nav aria-label="Навигация в футере">
         <a href="#calculator">Калькулятор</a>
         <a href="#collections">Коллекции</a>
         <a href="#specs">Характеристики</a>
         <a href="#lead">Контакты</a>
       </nav>
-      <p>© 2026 · Сделано в Казани · Политика конфиденциальности</p>
+      <p>© 2026 · Сделано в Казани · <a href="privacy.html">Политика обработки персональных данных</a></p>
     </div>
   </footer>
 
@@ -606,6 +608,6 @@
     <a href="https://t.me/" class="btn btn-outline" target="_blank" rel="noopener">Telegram</a>
   </div>
 
-  <script src="script.js?v=5"></script>
+  <script src="script.js?v=8"></script>
 </body>
 </html>

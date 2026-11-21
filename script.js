@@ -52,11 +52,12 @@ const fmt = (n, digits = 2) =>
   new Intl.NumberFormat('ru-RU', { minimumFractionDigits: digits, maximumFractionDigits: digits }).format(n);
 const fmtMoney = (n) =>
   new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 0 }).format(Math.round(n)) + ' ₽';
+const escapeHtml = (s) => String(s).replace(/[&<>"']/g, (c) =>
+  ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 
 function trackGoal(name) {
-  if (CONFIG.counterId && typeof window.ym === 'function') {
-    window.ym(CONFIG.counterId, 'reachGoal', name);
-  }
+  if (!CONFIG.counterId) return;
+  if (typeof window.ym === 'function') window.ym(CONFIG.counterId, 'reachGoal', name);
   window.dataLayer = window.dataLayer || [];
   window.dataLayer.push({ event: name });
   console.info('[goal]', name);
@@ -74,7 +75,8 @@ function clearErrors(root) {
 }
 function validContact(value) {
   const v = value.trim();
-  return v.length >= 6 && (/[0-9]/.test(v) || v.startsWith('@'));
+  if (v.startsWith('@')) return /^@[a-zA-Z0-9_]{4,32}$/.test(v);
+  return v.replace(/\D/g, '').length >= 10;
 }
 
 /* ---------- Калькулятор ---------- */
@@ -115,25 +117,36 @@ function compute(d) {
 /* ---------- Анимированный счётчик ---------- */
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+const animState = new WeakMap();
 function animateNumber(el, to, format, duration = 420) {
-  const from = Number(el.dataset.value || 0);
+  const state = animState.get(el) || { value: 0, raf: 0 };
+  const from = state.value;
+  if (state.raf) cancelAnimationFrame(state.raf);
+  if (state.fallback) clearTimeout(state.fallback);
   if (reduceMotion || from === to) {
-    el.dataset.value = to;
+    state.value = to; state.raf = 0; state.fallback = 0;
+    animState.set(el, state);
     el.textContent = format(to);
     return;
   }
-  if (el.dataset.raf) cancelAnimationFrame(Number(el.dataset.raf));
   const start = performance.now();
+  const finish = () => {
+    if (state.fallback) clearTimeout(state.fallback);
+    state.value = to; state.raf = 0; state.fallback = 0;
+    el.textContent = format(to);
+  };
   const tick = (now) => {
     const p = Math.min(1, (now - start) / duration);
     const eased = 1 - Math.pow(1 - p, 3);
     const value = from + (to - from) * eased;
-    el.dataset.value = value;
+    state.value = value;
     el.textContent = format(value);
-    if (p < 1) el.dataset.raf = requestAnimationFrame(tick);
-    else { el.dataset.value = to; el.textContent = format(to); }
+    if (p < 1) state.raf = requestAnimationFrame(tick);
+    else finish();
   };
-  el.dataset.raf = requestAnimationFrame(tick);
+  state.fallback = setTimeout(finish, duration + 100); // rAF может не стрелять в фоновой вкладке
+  state.raf = requestAnimationFrame(tick);
+  animState.set(el, state);
 }
 
 function renderCalc() {
@@ -147,10 +160,8 @@ function renderCalc() {
   return { d, r };
 }
 
-$$('#calcForm input, #calcForm select').forEach((el) => {
-  el.addEventListener('input', renderCalc);
-  el.addEventListener('change', renderCalc);
-});
+const calcInputs = $$('#width, #height, #panels, #collection, #clientType, #city, #corners, #cutouts');
+calcInputs.forEach((el) => el.addEventListener('input', renderCalc));
 renderCalc();
 
 /* ---------- Отправка заявок ---------- */
@@ -203,7 +214,14 @@ calcForm.addEventListener('submit', async (e) => {
   if (!$('#calcConsent').checked) {
     setError('calcConsent', 'Нужно согласие на обработку данных'); firstBad = firstBad || $('#calcConsent');
   }
-  if (firstBad) { firstBad.focus(); return; }
+  if (firstBad) {
+    const stepEl = firstBad.closest('.wiz-step');
+    if (stepEl && stepEl.dataset.step !== String(wizardStep)) {
+      showWizardStep(Number(stepEl.dataset.step));
+      window.setTimeout(() => firstBad.focus(), 60);
+    } else firstBad.focus();
+    return;
+  }
 
   const btn = $('#calcSubmit');
   btn.disabled = true;
@@ -271,15 +289,19 @@ $('#leadForm').addEventListener('submit', async (e) => {
 });
 
 /* ---------- Мобильное меню ---------- */
-$('#menuToggle').addEventListener('click', () => {
-  $('#nav').classList.toggle('open');
+$('#menuToggle').addEventListener('click', (e) => {
+  const open = $('#nav').classList.toggle('open');
+  e.currentTarget.setAttribute('aria-expanded', String(open));
 });
-$$('#nav a').forEach((a) => a.addEventListener('click', () => $('#nav').classList.remove('open')));
+$$('#nav a').forEach((a) => a.addEventListener('click', () => {
+  $('#nav').classList.remove('open');
+  $('#menuToggle').setAttribute('aria-expanded', 'false');
+}));
 
 /* ---------- Скрытая админ-ссылка (?admin=1) ---------- */
-if (new URLSearchParams(location.search).has('admin')) {
+if (new URLSearchParams(location.search).get('admin') === '1') {
   const link = document.createElement('a');
-  link.href = 'admin.html?v=3';
+  link.href = 'admin.html?v=5';
   link.className = 'admin-floating';
   link.textContent = 'Админ: заявки';
   document.body.appendChild(link);
@@ -311,36 +333,47 @@ if (!reduceMotion && 'IntersectionObserver' in window) {
   targets.forEach((el) => io.observe(el));
 }
 
-/* ---------- Прогресс прокрутки ---------- */
+/* ---------- Прогресс прокрутки (без layout-читаний на каждом скролле) ---------- */
 const progressBar = $('#scrollProgress');
+let pageMaxScroll = 1;
+let stickyShowFrom = 0;
+let stickyHideFrom = Infinity;
+
 function updateProgress() {
-  const max = document.documentElement.scrollHeight - window.innerHeight;
-  const value = max > 0 ? window.scrollY / max : 0;
+  const value = Math.min(1, Math.max(0, window.scrollY / pageMaxScroll));
   progressBar.style.width = (value * 100).toFixed(2) + '%';
 }
-window.addEventListener('scroll', updateProgress, { passive: true });
-window.addEventListener('resize', updateProgress);
-updateProgress();
+function measurePage() {
+  pageMaxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+  const hero = $('#hero');
+  const lead = $('#lead');
+  stickyShowFrom = hero.offsetTop + hero.offsetHeight - 120;
+  stickyHideFrom = lead.offsetTop - 200;
+  updateProgress();
+  updateSticky();
+}
 
 /* ---------- Анимация полос сравнения ---------- */
 const barTracks = $$('.bar-track');
+let barsDone = false;
 function checkBars() {
+  if (barsDone) return;
+  let allGrown = true;
   barTracks.forEach((track) => {
+    const bar = track.querySelector('.bar');
+    if (!bar) return;
+    if (bar.classList.contains('grow')) return;
     const rect = track.getBoundingClientRect();
-    if (rect.top < window.innerHeight * 0.9 && rect.bottom > 0) {
-      const bar = track.querySelector('.bar');
-      if (bar) bar.classList.add('grow');
-    }
+    if (rect.top < window.innerHeight * 0.9 && rect.bottom > 0) bar.classList.add('grow');
+    else allGrown = false;
   });
+  if (allGrown) barsDone = true;
 }
-window.addEventListener('scroll', checkBars, { passive: true });
-window.addEventListener('resize', checkBars);
-if (reduceMotion) $$('.bar').forEach((bar) => bar.classList.add('grow'));
-else checkBars();
+if (reduceMotion) { $$('.bar').forEach((bar) => bar.classList.add('grow')); barsDone = true; }
 
 /* ---------- Фильтр коллекций с анимацией ---------- */
 const collectionsGrid = $('#collectionsGrid');
-const filterButtons = $$('.filter-btn');
+const filterButtons = $$('#collectionFilters .filter-btn');
 
 filterButtons.forEach((btn) => {
   btn.addEventListener('click', () => {
@@ -379,21 +412,31 @@ function showWizardStep(n) {
   $('#wizNext').textContent = n === wizardSteps.length ? 'Отправить запрос' : 'Далее';
 }
 $('#wizPrev').addEventListener('click', () => showWizardStep(Math.max(1, wizardStep - 1)));
-$('#wizNext').addEventListener('click', () => {
-  if (wizardStep === 1) {
-    clearErrors(calcForm);
-    let bad = false;
-    const w = num($('#width').value);
-    const h = num($('#height').value);
-    if (w < 0.1 || w > 20) { setError('width', 'Укажите ширину от 0,1 до 20 м'); bad = true; }
-    if (h < 0.1 || h > 5) { setError('height', 'Укажите высоту от 0,1 до 5 м'); bad = true; }
-    if (bad) return;
-  }
+
+function validateCurrentStep() {
+  clearErrors(calcForm);
+  if (wizardStep !== 1) return true;
+  let ok = true;
+  const w = num($('#width').value);
+  const h = num($('#height').value);
+  if (w < 0.1 || w > 20) { setError('width', 'Укажите ширину от 0,1 до 20 м'); ok = false; }
+  if (h < 0.1 || h > 5) { setError('height', 'Укажите высоту от 0,1 до 5 м'); ok = false; }
+  return ok;
+}
+
+function goNext() {
+  if (!validateCurrentStep()) return;
   if (wizardStep === wizardSteps.length) {
-    calcForm.requestSubmit();
+    if (typeof calcForm.requestSubmit === 'function') calcForm.requestSubmit();
+    else calcForm.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
     return;
   }
   showWizardStep(wizardStep + 1);
+}
+$('#wizNext').addEventListener('click', goNext);
+$('#calcSubmit').addEventListener('click', () => {
+  if (wizardStep !== wizardSteps.length) showWizardStep(wizardSteps.length);
+  goNext();
 });
 showWizardStep(1);
 
@@ -457,19 +500,30 @@ $('#caseNext').addEventListener('click', () => $('#casesCarousel').scrollBy({ le
 /* ---------- Липкий CTA ---------- */
 const stickyCta = $('#stickyCta');
 function updateSticky() {
-  const heroEnd = $('#hero').offsetTop + $('#hero').offsetHeight;
-  const leadTop = $('#lead').offsetTop;
-  stickyCta.classList.toggle('visible', window.scrollY > heroEnd - 120 && window.scrollY < leadTop - 200);
+  const y = window.scrollY;
+  stickyCta.classList.toggle('visible', y > stickyShowFrom && y < stickyHideFrom);
 }
-window.addEventListener('scroll', updateSticky, { passive: true });
-window.addEventListener('resize', updateSticky);
-updateSticky();
+
+let scrollQueued = false;
+function onScroll() {
+  if (scrollQueued) return;
+  scrollQueued = true;
+  requestAnimationFrame(() => {
+    updateProgress();
+    updateSticky();
+    checkBars();
+    scrollQueued = false;
+  });
+}
+window.addEventListener('scroll', onScroll, { passive: true });
+window.addEventListener('resize', () => { measurePage(); checkBars(); });
+measurePage();
 
 /* ---------- PDF-документы (печать из браузера) ---------- */
 function openPrintable(title, rows, note) {
   const win = window.open('', '_blank', 'width=800,height=900');
   if (!win) return alert('Разрешите всплывающие окна для скачивания PDF');
-  const body = rows.map((r) => `<tr><td>${r[0]}</td><td><b>${r[1]}</b></td></tr>`).join('');
+  const body = rows.map((r) => `<tr><td>${escapeHtml(r[0])}</td><td><b>${escapeHtml(r[1])}</b></td></tr>`).join('');
   win.document.write(`<!DOCTYPE html><html lang="ru"><head><meta charset="utf-8"><title>${title}</title>
     <style>
       body{font-family:Arial,sans-serif;color:#161A1F;padding:40px;max-width:760px;margin:0 auto}
@@ -502,6 +556,7 @@ $('#pricePdf').addEventListener('click', () => {
   ];
   openPrintable('Прайс-лист · 3D-фартук 33 мм', rows, 'Цены ориентировочные. Точный счёт формируется после согласования образца и партии. Укажите «Сохранить как PDF» в окне печати.');
 });
+$('#mobilePricePdf').addEventListener('click', () => $('#pricePdf').click());
 $('#techPdf').addEventListener('click', () => {
   openPrintable('Техническая карта · 3D-фартук 33 мм', [
     ['Толщина', '33 мм'],
@@ -523,7 +578,10 @@ if ('serviceWorker' in navigator) {
 }
 
 /* ---------- A/B-тест первого экрана ---------- */
-const heroVariant = localStorage.getItem('hero_variant') || (Math.random() < 0.5 ? 'a' : 'b');
-localStorage.setItem('hero_variant', heroVariant);
+let heroVariant = 'a';
+try {
+  heroVariant = localStorage.getItem('hero_variant') || (Math.random() < 0.5 ? 'a' : 'b');
+  localStorage.setItem('hero_variant', heroVariant);
+} catch (e) { /* приватный режим — используем вариант a */ }
 document.body.classList.add('hero-' + heroVariant);
 trackGoal('hero_variant_' + heroVariant);
