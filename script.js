@@ -40,6 +40,8 @@ const CONFIG = {
 };
 
 /* ---------- Утилиты ---------- */
+document.documentElement.classList.add('js');
+
 const $ = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 const num = (v) => {
@@ -308,3 +310,30 @@ if (!reduceMotion && 'IntersectionObserver' in window) {
   }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
   targets.forEach((el) => io.observe(el));
 }
+
+/* ---------- Прогресс прокрутки ---------- */
+const progressBar = $('#scrollProgress');
+function updateProgress() {
+  const max = document.documentElement.scrollHeight - window.innerHeight;
+  const value = max > 0 ? window.scrollY / max : 0;
+  progressBar.style.width = (value * 100).toFixed(2) + '%';
+}
+window.addEventListener('scroll', updateProgress, { passive: true });
+window.addEventListener('resize', updateProgress);
+updateProgress();
+
+/* ---------- Анимация полос сравнения ---------- */
+const barTracks = $$('.bar-track');
+function checkBars() {
+  barTracks.forEach((track) => {
+    const rect = track.getBoundingClientRect();
+    if (rect.top < window.innerHeight * 0.9 && rect.bottom > 0) {
+      const bar = track.querySelector('.bar');
+      if (bar) bar.classList.add('grow');
+    }
+  });
+}
+window.addEventListener('scroll', checkBars, { passive: true });
+window.addEventListener('resize', checkBars);
+if (reduceMotion) $$('.bar').forEach((bar) => bar.classList.add('grow'));
+else checkBars();
