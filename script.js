@@ -711,6 +711,26 @@ if ('serviceWorker' in navigator) {
   });
 }
 
+/* ---------- Световые акценты и магнитные кнопки ---------- */
+if (!reduceMotion) {
+  $$('.collection-card,.case-card,.review-card,.asset-card').forEach((card) => {
+    card.addEventListener('pointermove', (e) => {
+      const rect = card.getBoundingClientRect();
+      card.style.setProperty('--mx', (e.clientX - rect.left) + 'px');
+      card.style.setProperty('--my', (e.clientY - rect.top) + 'px');
+    });
+  });
+  $$('.btn-accent').forEach((btn) => {
+    btn.addEventListener('pointermove', (e) => {
+      const rect = btn.getBoundingClientRect();
+      const x = (e.clientX - rect.left - rect.width / 2) * 0.08;
+      const y = (e.clientY - rect.top - rect.height / 2) * 0.12;
+      btn.style.transform = `translate(${x}px, ${y}px)`;
+    });
+    btn.addEventListener('pointerleave', () => { btn.style.transform = ''; });
+  });
+}
+
 /* ---------- Панель доступности ---------- */
 $('#a11yToggle').addEventListener('click', (e) => {
   const body = $('#a11yBody');
