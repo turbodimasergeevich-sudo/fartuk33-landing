@@ -19,7 +19,7 @@
   <meta name="twitter:image" content="https://turbodimasergeevich-sudo.github.io/fartuk33-landing/assets/kitchen-preview.webp">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="icon-192.png">
-  <link rel="stylesheet" href="styles.css?v=16">
+  <link rel="stylesheet" href="styles.css?v=17">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -189,6 +189,7 @@
             <div class="wizard-head">
               <div class="wizard-track"><div class="wizard-bar" id="wizardBar"></div></div>
               <div class="wizard-label" id="wizardLabel">Шаг 1 из 4 · Размеры</div>
+              <div class="calc-mini"><span>Итого</span><b id="calcMiniPrice">—</b></div>
             </div>
 
             <fieldset class="wiz-step is-active" data-step="1">
@@ -309,6 +310,15 @@
               <b id="resPrice">— ₽</b>
             </div>
             <div class="result-term">Срок отгрузки: <b id="resTerm">3–5 дней</b></div>
+            <button type="button" class="breakdown-toggle" id="breakdownToggle" aria-expanded="false">Из чего складывается цена <span>▾</span></button>
+            <div class="breakdown" id="breakdown" hidden>
+              <div><span>База × площадь</span><b id="bdBase">—</b></div>
+              <div><span id="bdCollectionLabel">Коллекция</span><b id="bdCollection">—</b></div>
+              <div><span id="bdClientLabel">Тип клиента</span><b id="bdClient">—</b></div>
+              <div><span>Опции</span><b id="bdOptions">—</b></div>
+              <div><span>Доставка</span><b id="bdDelivery">—</b></div>
+              <div class="breakdown-total"><span>Итого</span><b id="bdTotal">—</b></div>
+            </div>
             <button type="button" class="btn btn-accent btn-block" id="calcSubmit">Отправить запрос</button>
             <p class="result-note">Цена указана за чистую площадь без запаса. Данные уйдут менеджеру; точный счёт — после согласования образца и партии.</p>
             <div class="form-success" id="calcSuccess" hidden>
@@ -753,6 +763,6 @@
     <a href="https://t.me/" class="btn btn-outline" target="_blank" rel="noopener">Telegram</a>
   </div>
 
-  <script src="script.js?v=12"></script>
+  <script src="script.js?v=13"></script>
 </body>
 </html>

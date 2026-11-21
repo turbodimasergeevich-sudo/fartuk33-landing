@@ -64,6 +64,7 @@ if (CONFIG.counterId) initMetrika(CONFIG.counterId);
 
 /* ---------- Утилиты ---------- */
 document.documentElement.classList.add('js');
+let heroVariant = 'a';
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
@@ -175,6 +176,9 @@ function animateNumber(el, to, format, duration = 420) {
   animState.set(el, state);
 }
 
+const COLLECTION_NAMES = { stone: 'Камень', wood: 'Дерево', concrete: 'Бетон', '3d': '3D-геометрия' };
+const CLIENT_NAMES = { designer: 'Дизайнер', contractor: 'Подрядчик', dealer: 'Дилер', retail: 'Розница' };
+
 function renderCalc() {
   const d = readCalc();
   const r = compute(d);
@@ -183,6 +187,21 @@ function renderCalc() {
   animateNumber($('#resPanels'), r.panels, (v) => Math.round(v) + ' шт.');
   animateNumber($('#resPrice'), r.price, (v) => fmtMoney(v), 520);
   $('#resTerm').textContent = r.term;
+  $('#calcMiniPrice').textContent = fmtMoney(r.price);
+
+  const base = r.area * CONFIG.basePrice;
+  const collection = base * ((CONFIG.collectionCoeff[d.collection] || 1) - 1);
+  const client = (base + collection) * ((CONFIG.clientCoeff[d.clientType] || 1) - 1);
+  const options = d.corners * CONFIG.optionCost.corner + d.cutouts * CONFIG.optionCost.cutout;
+  const delivery = CONFIG.deliveryCost[d.city] || 0;
+  $('#bdBase').textContent = fmtMoney(base);
+  $('#bdCollectionLabel').textContent = 'Коллекция · ' + (COLLECTION_NAMES[d.collection] || d.collection);
+  $('#bdCollection').textContent = (collection >= 0 ? '+' : '−') + fmtMoney(Math.abs(collection));
+  $('#bdClientLabel').textContent = 'Тип клиента · ' + (CLIENT_NAMES[d.clientType] || d.clientType);
+  $('#bdClient').textContent = (client >= 0 ? '+' : '−') + fmtMoney(Math.abs(client));
+  $('#bdOptions').textContent = (options >= 0 ? '+' : '−') + fmtMoney(Math.abs(options));
+  $('#bdDelivery').textContent = (delivery >= 0 ? '+' : '−') + fmtMoney(Math.abs(delivery));
+  $('#bdTotal').textContent = fmtMoney(base + collection + client + options + delivery);
   return { d, r };
 }
 
@@ -219,7 +238,7 @@ async function sendLead(payload, source) {
   // 2) Локальная копия (демо-режим)
   try {
     const leads = JSON.parse(localStorage.getItem('fartuk33_leads') || '[]');
-    leads.push({ ...payload, source, sentAt: new Date().toISOString() });
+    leads.push({ ...payload, source, sentAt: new Date().toISOString(), heroVariant });
     localStorage.setItem('fartuk33_leads', JSON.stringify(leads));
   } catch (e) { /* localStorage может быть недоступен */ }
 
@@ -375,7 +394,7 @@ $$('#nav a').forEach((a) => a.addEventListener('click', () => {
 /* ---------- Скрытая админ-ссылка (?admin=1) ---------- */
 if (new URLSearchParams(location.search).get('admin') === '1') {
   const link = document.createElement('a');
-  link.href = 'admin.html?v=5';
+  link.href = 'admin.html?v=6';
   link.className = 'admin-floating';
   link.textContent = 'Админ: заявки';
   document.body.appendChild(link);
@@ -513,6 +532,11 @@ function goNext() {
   showWizardStep(wizardStep + 1);
 }
 $('#wizNext').addEventListener('click', goNext);
+$('#breakdownToggle').addEventListener('click', (e) => {
+  const box = $('#breakdown');
+  box.hidden = !box.hidden;
+  e.currentTarget.setAttribute('aria-expanded', String(!box.hidden));
+});
 $('#calcSubmit').addEventListener('click', () => {
   if (wizardStep !== wizardSteps.length) showWizardStep(wizardSteps.length);
   goNext();
@@ -659,7 +683,6 @@ if ('serviceWorker' in navigator) {
 }
 
 /* ---------- A/B-тест первого экрана ---------- */
-let heroVariant = 'a';
 try {
   heroVariant = localStorage.getItem('hero_variant') || (Math.random() < 0.5 ? 'a' : 'b');
   localStorage.setItem('hero_variant', heroVariant);

@@ -633,6 +633,32 @@ img{max-width:100%;display:block}
 .trust-docs{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:26px}
 .trust-docs span{font-size:11px;color:#5c636c}
 
+/* ============ РАСШИФРОВКА ЦЕНЫ ============ */
+.breakdown-toggle{
+  width:100%;border:0;background:none;color:rgba(255,255,255,.78);
+  font:inherit;font-size:12px;font-weight:700;text-align:left;
+  padding:8px 0 12px;cursor:pointer;
+}
+.breakdown-toggle span{float:right;transition:transform .2s ease}
+.breakdown-toggle[aria-expanded="true"] span{transform:rotate(180deg)}
+.breakdown{margin:-4px 0 16px;padding:12px 0;border-top:1px solid var(--line-light);font-size:12px}
+.breakdown div{display:flex;justify-content:space-between;gap:12px;padding:4px 0}
+.breakdown span{color:rgba(255,255,255,.65)}
+.breakdown-total{border-top:1px solid var(--line-light);margin-top:6px;padding-top:8px}
+.breakdown-total b{color:var(--accent)}
+
+/* ============ ФОКУС И ПЕЧАТЬ ============ */
+:focus-visible{outline:3px solid rgba(217,104,60,.45);outline-offset:2px}
+.calc-mini{display:none}
+@media print{
+  .site-header,.mobile-bar,.sticky-cta,.wizard-nav,.btn,.filter-btn,.carousel-nav,
+  .collection-filters,.admin-floating,.scroll-progress{display:none !important}
+  body{background:#fff;color:#000}
+  .section{padding:18px 0;break-inside:avoid}
+  .section-dark,.section-light{background:#fff;color:#000}
+  .section-dark p,.section-dark h2,.section-dark h3{color:#000}
+}
+
 /* ============ RESPONSIVE ============ */
 @media (max-width:1024px){
   .section{padding:76px 0}
@@ -681,6 +707,13 @@ img{max-width:100%;display:block}
   .sticky-cta{display:none}
   .cases-carousel .case-card{flex-basis:78%}
   .asset-gallery{grid-template-columns:1fr}
+  .calc-mini{
+    display:flex;justify-content:space-between;align-items:center;
+    background:var(--dark);color:#fff;padding:9px 14px;border-radius:5px;
+    margin:10px 0 4px;font-size:12px;font-weight:700;
+    position:sticky;top:76px;z-index:6;
+  }
+  .calc-mini b{color:var(--accent)}
   .logo-strip{grid-template-columns:1fr 1fr}
   .reviews{grid-template-columns:1fr}
   .trust-stats{grid-template-columns:1fr 1fr}

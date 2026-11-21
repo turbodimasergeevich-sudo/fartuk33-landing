@@ -59,12 +59,18 @@
       </div>
       <div class="live-meta">
         <b id="lastLead">—</b>
+        <span id="abSummary">A/B: —</span>
         <span id="updatedAt">ожидание обновлений</span>
       </div>
     </div>
 
     <div class="filters">
       <input type="search" id="leadSearch" placeholder="Поиск по компании, телефону, городу…" aria-label="Поиск по заявкам">
+      <select id="filterVariant" aria-label="Фильтр по A/B-варианту">
+        <option value="all">Все варианты</option>
+        <option value="a">Вариант A</option>
+        <option value="b">Вариант B</option>
+      </select>
       <select id="filterDate" aria-label="Фильтр по дате">
         <option value="all">Все даты</option>
         <option value="7">Последние 7 дней</option>
@@ -122,11 +128,13 @@
       const type = $('#filterType').value;
       const source = $('#filterSource').value;
       const days = $('#filterDate').value;
+      const variant = $('#filterVariant').value;
       const query = $('#leadSearch').value.trim().toLowerCase();
       const cutoff = days === 'all' ? null : Date.now() - Number(days) * 86400000;
       return leads.filter((r) => {
         if (type !== 'all' && r.clientType !== type) return false;
         if (source !== 'all' && r.source !== source) return false;
+        if (variant !== 'all' && r.heroVariant !== variant) return false;
         if (cutoff) {
           const t = Date.parse(r.sentAt || r.timestamp || '');
           if (!t || t < cutoff) return false;
@@ -200,6 +208,8 @@
       $('#count').textContent = `Заявок: ${leads.length}`;
       const last = leads[leads.length - 1];
       $('#lastLead').textContent = last ? `Последняя: ${dateOf(last)}` : '—';
+      $('#abSummary').textContent = 'A/B: A ' + leads.filter(r => r.heroVariant === 'a').length +
+        ' · B ' + leads.filter(r => r.heroVariant === 'b').length;
       $('#updatedAt').textContent = 'обновлено ' + new Date().toLocaleTimeString('ru-RU');
       if (bump) {
         const box = $('#liveBox');
@@ -234,11 +244,12 @@
           <td>${r.panels ? escHtml(r.panels + ' шт.') : '—'}</td>
           <td>${r.estimatedPrice ? escHtml(r.estimatedPrice.toLocaleString('ru-RU') + ' ₽') : '—'}</td>
           <td>${escHtml(details || r.comment || '—')}</td>
+          <td>${r.heroVariant ? (r.heroVariant === 'a' ? 'A' : 'B') : '—'}</td>
           <td><button type="button" class="btn-del" data-del="${leads.indexOf(r)}" aria-label="Удалить заявку">Удалить</button></td>
         </tr>`;
       }).join('');
       $('#tableBox').innerHTML = `<table>
-        <thead><tr><th>Дата</th><th>Источник</th><th>Компания</th><th>Телефон</th><th>Город</th><th>Тип</th><th>Площадь</th><th>Панели</th><th>Стоимость</th><th>Детали</th><th></th></tr></thead>
+        <thead><tr><th>Дата</th><th>Источник</th><th>Компания</th><th>Телефон</th><th>Город</th><th>Тип</th><th>Площадь</th><th>Панели</th><th>Стоимость</th><th>Детали</th><th>A/B</th><th></th></tr></thead>
         <tbody>${rows}</tbody>
       </table>`;
     }
@@ -259,7 +270,8 @@
         'Вырезы': opts.cutouts || 0,
         'Комментарий': val(r, ['comment']),
         'Коллекция': val(r, ['collection']),
-        'Срок': val(r, ['term'])
+        'Срок': val(r, ['term']),
+        'A/B-вариант': val(r, ['heroVariant'])
       };
     }
 
@@ -310,6 +322,7 @@
     $('#filterType').addEventListener('change', () => render(false));
     $('#filterSource').addEventListener('change', () => render(false));
     $('#filterDate').addEventListener('change', () => render(false));
+    $('#filterVariant').addEventListener('change', () => render(false));
     $('#leadSearch').addEventListener('input', () => render(false));
     $('#tableBox').addEventListener('click', (e) => {
       const btn = e.target.closest('[data-del]');
