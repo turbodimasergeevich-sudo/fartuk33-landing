@@ -512,17 +512,6 @@ body.a11y-noimages img,body.a11y-noimages .case-photo-1,body.a11y-noimages .case
 }
 body.a11y-contrast .hero-content h1 span{color:var(--accent-strong);background:none;-webkit-text-fill-color:currentColor}
 
-@supports (animation-timeline: view()){
-  @media (prefers-reduced-motion: no-preference){
-    .trust-stats div,.review-card,.asset-card,.logo-wordmark,.sample-steps span,.contact-box{
-      animation:sd-reveal linear both;
-      animation-timeline:view();
-      animation-range:entry 0% cover 35%;
-    }
-  }
-}
-@keyframes sd-reveal{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
-
 /* ============ ДОПОЛНИТЕЛЬНЫЕ УЛУЧШЕНИЯ ============ */
 .scroll-progress{
   position:fixed;top:0;left:0;height:3px;width:0;
