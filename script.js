@@ -279,7 +279,7 @@ $$('#nav a').forEach((a) => a.addEventListener('click', () => $('#nav').classLis
 /* ---------- Скрытая админ-ссылка (?admin=1) ---------- */
 if (new URLSearchParams(location.search).has('admin')) {
   const link = document.createElement('a');
-  link.href = 'admin.html';
+  link.href = 'admin.html?v=2';
   link.className = 'admin-floating';
   link.textContent = 'Админ: заявки';
   document.body.appendChild(link);
@@ -337,3 +337,30 @@ window.addEventListener('scroll', checkBars, { passive: true });
 window.addEventListener('resize', checkBars);
 if (reduceMotion) $$('.bar').forEach((bar) => bar.classList.add('grow'));
 else checkBars();
+
+/* ---------- Фильтр коллекций с анимацией ---------- */
+const collectionsGrid = $('#collectionsGrid');
+const filterButtons = $$('.filter-btn');
+
+filterButtons.forEach((btn) => {
+  btn.addEventListener('click', () => {
+    const filter = btn.dataset.filter;
+    filterButtons.forEach((b) => b.classList.toggle('is-active', b === btn));
+    collectionsGrid.classList.add('is-switching');
+    window.setTimeout(() => {
+      $$('.collection-card', collectionsGrid).forEach((card) => {
+        const show = filter === 'all' || card.dataset.collection === filter;
+        card.classList.toggle('is-hidden', !show);
+      });
+      collectionsGrid.classList.remove('is-switching');
+    }, reduceMotion ? 0 : 220);
+  });
+});
+
+$$('.collection-card', collectionsGrid).forEach((card) => {
+  card.addEventListener('click', () => {
+    $('#collection').value = card.dataset.collection;
+    renderCalc();
+    $('#calculator').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth' });
+  });
+});

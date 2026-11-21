@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>3D-фартук 33 мм для кухни — поставщик из Казани</title>
   <meta name="description" content="Жёсткие 3D-панели толщиной 33 мм для кухонь. Поставщик из Казани, отгрузка по России. Онлайн-расчёт стоимости, образцы и работа с дизайнерами.">
-  <link rel="stylesheet" href="styles.css?v=5">
+  <link rel="stylesheet" href="styles.css?v=6">
 </head>
 <body>
 
@@ -257,11 +257,22 @@
           <div class="eyebrow">Каталог</div>
           <h2>Текстуры и коллекции</h2>
         </div>
-        <div class="grid-4 collections-grid">
-          <div class="collection-card texture-stone"><span>Камень</span></div>
-          <div class="collection-card texture-wood"><span>Дерево</span></div>
-          <div class="collection-card texture-concrete"><span>Бетон</span></div>
-          <div class="collection-card texture-3d"><span>3D-геометрия</span></div>
+        <div class="collection-filters" id="collectionFilters" role="group" aria-label="Фильтр коллекций">
+          <button type="button" class="filter-btn is-active" data-filter="all">Все</button>
+          <button type="button" class="filter-btn" data-filter="stone">Камень</button>
+          <button type="button" class="filter-btn" data-filter="wood">Дерево</button>
+          <button type="button" class="filter-btn" data-filter="concrete">Бетон</button>
+          <button type="button" class="filter-btn" data-filter="3d">3D-геометрия</button>
+        </div>
+        <div class="grid-4 collections-grid" id="collectionsGrid">
+          <button type="button" class="collection-card texture-stone" data-collection="stone" data-name="Камень · Классический"><span>Камень · Классический</span></button>
+          <button type="button" class="collection-card texture-stone variant-2" data-collection="stone" data-name="Камень · Травертин"><span>Камень · Травертин</span></button>
+          <button type="button" class="collection-card texture-wood" data-collection="wood" data-name="Дерево · Дуб"><span>Дерево · Дуб</span></button>
+          <button type="button" class="collection-card texture-wood variant-2" data-collection="wood" data-name="Дерево · Орех"><span>Дерево · Орех</span></button>
+          <button type="button" class="collection-card texture-concrete" data-collection="concrete" data-name="Бетон · Графит"><span>Бетон · Графит</span></button>
+          <button type="button" class="collection-card texture-concrete variant-2" data-collection="concrete" data-name="Бетон · Лофт"><span>Бетон · Лофт</span></button>
+          <button type="button" class="collection-card texture-3d" data-collection="3d" data-name="3D · Соты"><span>3D · Соты</span></button>
+          <button type="button" class="collection-card texture-3d variant-2" data-collection="3d" data-name="3D · Волна"><span>3D · Волна</span></button>
         </div>
         <div class="center"><a href="#lead" class="btn btn-outline">Смотреть все текстуры</a></div>
       </div>
@@ -437,6 +448,6 @@
     <a href="https://t.me/" class="btn btn-outline" target="_blank" rel="noopener">Telegram</a>
   </div>
 
-  <script src="script.js?v=2"></script>
+  <script src="script.js?v=3"></script>
 </body>
 </html>

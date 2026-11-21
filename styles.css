@@ -289,6 +289,24 @@ img{max-width:100%;display:block}
 .form-success span{color:rgba(255,255,255,.75);font-size:12px}
 
 /* ============ COLLECTIONS / CASES ============ */
+.collection-filters{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:24px}
+.filter-btn{
+  border:1px solid var(--line);background:transparent;color:#5c636c;
+  padding:9px 16px;border-radius:20px;font:inherit;font-size:13px;font-weight:700;
+  cursor:pointer;transition:.2s ease;
+}
+.filter-btn:hover{border-color:var(--accent);color:var(--accent)}
+.filter-btn.is-active{background:var(--dark);border-color:var(--dark);color:#fff}
+
+.collection-card{
+  appearance:none;font:inherit;text-align:left;color:#fff;
+  padding:0;cursor:pointer;
+}
+.collection-card.variant-2{filter:hue-rotate(-12deg) brightness(.92) contrast(1.05)}
+.collections-grid.is-switching{opacity:0;transform:translateY(10px) scale(.985)}
+.collections-grid{transition:opacity .22s ease,transform .22s ease}
+.collection-card.is-hidden{display:none}
+
 .collection-card,.case-card{
   position:relative;min-height:210px;border-radius:var(--radius);
   overflow:hidden;border:1px solid var(--line);

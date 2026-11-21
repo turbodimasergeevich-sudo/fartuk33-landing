@@ -15,6 +15,17 @@
     .btn.primary{background:#D9683C;border-color:#D9683C;color:#fff}
     .btn.danger{color:#b3261e;border-color:#e2b4b0}
     .count{font-size:13px;color:#5c636c;margin-left:auto}
+    .live{display:flex;align-items:center;gap:16px;background:#161A1F;color:#fff;border-radius:8px;padding:18px 22px;margin-bottom:22px}
+    .live-dot{width:10px;height:10px;border-radius:50%;background:#4ade80;box-shadow:0 0 0 0 rgba(74,222,128,.6);animation:pulse 2s infinite}
+    @keyframes pulse{70%{box-shadow:0 0 0 12px rgba(74,222,128,0)}100%{box-shadow:0 0 0 0 rgba(74,222,128,0)}}
+    .live-num{font-size:38px;font-weight:800;line-height:1;letter-spacing:-.03em}
+    .live-label{font-size:12px;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.08em}
+    .live-meta{margin-left:auto;font-size:12px;color:rgba(255,255,255,.6);text-align:right}
+    .live-meta b{display:block;color:#9fe0cd;font-size:13px}
+    .live.bump{animation:bump .45s ease}
+    @keyframes bump{0%{transform:scale(1)}40%{transform:scale(1.015)}100%{transform:scale(1)}}
+    .live-num.pop{animation:count-pop .45s ease}
+    @keyframes count-pop{0%{transform:scale(1)}45%{transform:scale(1.18);color:#9fe0cd}100%{transform:scale(1)}}
     table{width:100%;border-collapse:collapse;font-size:12px}
     th,td{border-bottom:1px solid #e4e7ea;padding:10px 8px;text-align:left;vertical-align:top}
     th{background:#f6f7f8;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:#6b7178}
@@ -28,6 +39,18 @@
   <div class="wrap">
     <h1>Заявки с лендинга</h1>
     <div class="sub">Демо-режим: заявки хранятся в браузере (<code>localStorage</code>). Для боевого режима укажите <code>crmEndpoint</code> в <code>script.js</code>.</div>
+
+    <div class="live" id="liveBox">
+      <span class="live-dot" aria-hidden="true"></span>
+      <div>
+        <div class="live-num" id="liveCount">0</div>
+        <div class="live-label">заявок сейчас</div>
+      </div>
+      <div class="live-meta">
+        <b id="lastLead">—</b>
+        <span id="updatedAt">ожидание обновлений</span>
+      </div>
+    </div>
 
     <div class="bar">
       <button class="btn primary" id="exportCsv">Скачать CSV (Excel)</button>
@@ -68,8 +91,32 @@
       return ({ designer:'Дизайнер', contractor:'Подрядчик', dealer:'Дилер', retail:'Частное лицо' })[v] || v || '—';
     }
 
-    function render() {
+    function animateCount(to, pop) {
+      const el = $('#liveCount');
+      el.textContent = to;
+      if (pop) {
+        el.classList.remove('pop');
+        void el.offsetWidth;
+        el.classList.add('pop');
+      }
+    }
+
+    function updateLive(bump) {
+      animateCount(leads.length, bump);
       $('#count').textContent = `Заявок: ${leads.length}`;
+      const last = leads[leads.length - 1];
+      $('#lastLead').textContent = last ? `Последняя: ${dateOf(last)}` : '—';
+      $('#updatedAt').textContent = 'обновлено ' + new Date().toLocaleTimeString('ru-RU');
+      if (bump) {
+        const box = $('#liveBox');
+        box.classList.remove('bump');
+        void box.offsetWidth;
+        box.classList.add('bump');
+      }
+    }
+
+    function render(bump) {
+      updateLive(Boolean(bump));
       if (!leads.length) {
         $('#tableBox').innerHTML = '<div class="empty">Заявок пока нет. Отправьте тестовую заявку с лендинга.</div>';
         return;
@@ -152,10 +199,22 @@
       if (!confirm('Удалить все заявки из браузера?')) return;
       localStorage.removeItem(KEY);
       leads = [];
-      render();
+      render(true);
     });
 
     render();
+
+    function refreshFromStorage(bump) {
+      const next = load();
+      if (JSON.stringify(next) !== JSON.stringify(leads)) {
+        leads = next;
+        render(bump);
+      }
+    }
+    window.addEventListener('storage', (e) => {
+      if (e.key === KEY) refreshFromStorage(true);
+    });
+    setInterval(() => refreshFromStorage(true), 3000);
   </script>
 </body>
 </html>
