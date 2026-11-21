@@ -39,6 +39,27 @@ const CONFIG = {
   term: { kazan: '3–5 дней', region: '5–9 дней' }
 };
 
+/* ---------- Яндекс.Метрика (подключается по ID из CONFIG) ---------- */
+function initMetrika(id) {
+  if (!id) return;
+  if (!window.ym) {
+    window.ym = function () { (window.ym.a = window.ym.a || []).push(arguments); };
+    window.ym.l = 1 * new Date();
+    const tag = document.createElement('script');
+    tag.async = 1;
+    tag.src = 'https://mc.yandex.ru/metrika/tag.js';
+    const first = document.getElementsByTagName('script')[0];
+    first.parentNode.insertBefore(tag, first);
+  }
+  window.ym(id, 'init', {
+    clickmap: true,
+    trackLinks: true,
+    accurateTrackBounce: true,
+    webvisor: true
+  });
+}
+if (CONFIG.counterId) initMetrika(CONFIG.counterId);
+
 /* ---------- Утилиты ---------- */
 document.documentElement.classList.add('js');
 
