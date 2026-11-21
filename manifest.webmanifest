@@ -1,0 +1,19 @@
+{
+  "name": "3D-фартук 33 мм — поставщик из Казани",
+  "short_name": "Фартук 33",
+  "description": "Жёсткие 3D-панели толщиной 33 мм для кухонь. Расчёт стоимости и заявки.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#F4F1EC",
+  "theme_color": "#161A1F",
+  "lang": "ru",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

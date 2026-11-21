@@ -5,7 +5,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>3D-фартук 33 мм для кухни — поставщик из Казани</title>
   <meta name="description" content="Жёсткие 3D-панели толщиной 33 мм для кухонь. Поставщик из Казани, отгрузка по России. Онлайн-расчёт стоимости, образцы и работа с дизайнерами.">
-  <link rel="stylesheet" href="styles.css?v=6">
+  <meta name="theme-color" content="#161A1F">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="styles.css?v=8">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {"@type":"Question","name":"Как заказать образец 3D-фартука 33 мм?","acceptedAnswer":{"@type":"Answer","text":"Оставьте заявку на сайте или в калькуляторе — менеджер согласует образец и отправит его в Казань или другой город России."}},
+      {"@type":"Question","name":"Сколько занимает доставка по России?","acceptedAnswer":{"@type":"Answer","text":"По Казани отгрузка занимает 3–5 дней, в регионы — 5–9 дней. Точный срок зависит от партии и транспортной компании."}},
+      {"@type":"Question","name":"Можно ли подобрать текстуру под конкретный проект?","acceptedAnswer":{"@type":"Answer","text":"Да. Дизайнерам и архитекторам предоставляются образцы, текстуры, техническая документация и помощь в подборе."}},
+      {"@type":"Question","name":"Как монтируется фартук толщиной 33 мм?","acceptedAnswer":{"@type":"Answer","text":"Панель монтируется на подготовленную стену; способ крепления и параметры партии уточняются в техкарте."}},
+      {"@type":"Question","name":"Предоставляете ли вы техкарту и 3D-модели?","acceptedAnswer":{"@type":"Answer","text":"Техническая карта и материалы для проекта предоставляются по запросу для дизайнеров и подрядчиков."}}
+    ]
+  }
+  </script>
 </head>
 <body>
 
@@ -24,7 +39,7 @@
         <a href="#cases">Кейсы</a>
       </nav>
       <div class="header-actions">
-        <a href="#lead" class="btn btn-ghost">Скачать прайс</a>
+        <button type="button" class="btn btn-ghost" id="pricePdf">Скачать прайс</button>
         <a href="#lead" class="btn btn-accent">Получить КП</a>
       </div>
       <button class="menu-toggle" id="menuToggle" aria-label="Открыть меню">☰</button>
@@ -142,82 +157,105 @@
 
         <div class="calculator-wrap">
           <form class="calc-form" id="calcForm" novalidate>
-            <div class="form-row">
-              <div class="field">
-                <label for="width">Ширина фартука, м</label>
-                <input type="number" id="width" step="0.1" min="0.1" max="20" value="2.4" required>
-                <small class="error" data-error="width"></small>
-              </div>
-              <div class="field">
-                <label for="height">Высота фартука, м</label>
-                <input type="number" id="height" step="0.1" min="0.1" max="5" value="0.65" required>
-                <small class="error" data-error="height"></small>
-              </div>
+            <div class="wizard-head">
+              <div class="wizard-track"><div class="wizard-bar" id="wizardBar"></div></div>
+              <div class="wizard-label" id="wizardLabel">Шаг 1 из 4 · Размеры</div>
             </div>
 
-            <div class="form-row">
-              <div class="field">
-                <label for="collection">Коллекция / текстура</label>
-                <select id="collection">
-                  <option value="stone">Камень</option>
-                  <option value="wood">Дерево</option>
-                  <option value="concrete">Бетон</option>
-                  <option value="3d">3D-геометрия</option>
-                </select>
+            <fieldset class="wiz-step is-active" data-step="1">
+              <legend class="sr-only">Размеры фартука</legend>
+              <div class="form-row">
+                <div class="field">
+                  <label for="width">Ширина фартука, м</label>
+                  <input type="number" id="width" step="0.1" min="0.1" max="20" value="2.4" required>
+                  <small class="error" data-error="width"></small>
+                </div>
+                <div class="field">
+                  <label for="height">Высота фартука, м</label>
+                  <input type="number" id="height" step="0.1" min="0.1" max="5" value="0.65" required>
+                  <small class="error" data-error="height"></small>
+                </div>
               </div>
-              <div class="field">
-                <label for="clientType">Тип клиента</label>
-                <select id="clientType">
-                  <option value="designer">Дизайнер / архитектор</option>
-                  <option value="contractor">Подрядчик / прораб</option>
-                  <option value="dealer">Дилер / салон</option>
-                  <option value="retail">Частное лицо</option>
-                </select>
+              <div class="form-row">
+                <div class="field">
+                  <label for="panels">Количество панелей (если известно)</label>
+                  <input type="number" id="panels" min="0" step="1" value="0" placeholder="Рассчитаем автоматически">
+                </div>
               </div>
-            </div>
+            </fieldset>
 
-            <div class="form-row">
-              <div class="field">
-                <label for="city">Город доставки</label>
-                <select id="city">
-                  <option value="kazan">Казань</option>
-                  <option value="region">Другой город РФ</option>
-                </select>
+            <fieldset class="wiz-step" data-step="2">
+              <legend class="sr-only">Текстура и клиент</legend>
+              <div class="form-row">
+                <div class="field">
+                  <label for="collection">Коллекция / текстура</label>
+                  <select id="collection">
+                    <option value="stone">Камень</option>
+                    <option value="wood">Дерево</option>
+                    <option value="concrete">Бетон</option>
+                    <option value="3d">3D-геометрия</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="clientType">Тип клиента</label>
+                  <select id="clientType">
+                    <option value="designer">Дизайнер / архитектор</option>
+                    <option value="contractor">Подрядчик / прораб</option>
+                    <option value="dealer">Дилер / салон</option>
+                    <option value="retail">Частное лицо</option>
+                  </select>
+                </div>
               </div>
-              <div class="field">
-                <label for="panels">Количество панелей (если известно)</label>
-                <input type="number" id="panels" min="0" step="1" value="0" placeholder="Рассчитаем автоматически">
-              </div>
-            </div>
+            </fieldset>
 
-            <div class="form-row options-row">
-              <div class="field">
-                <label for="corners">Углы, шт</label>
-                <input type="number" id="corners" min="0" step="1" value="0">
+            <fieldset class="wiz-step" data-step="3">
+              <legend class="sr-only">Доставка и опции</legend>
+              <div class="form-row">
+                <div class="field">
+                  <label for="city">Город доставки</label>
+                  <select id="city">
+                    <option value="kazan">Казань</option>
+                    <option value="region">Другой город РФ</option>
+                  </select>
+                </div>
+                <div class="wiz-note">Доставка по Казани включена, в регионы — от 2 500 ₽.</div>
               </div>
-              <div class="field">
-                <label for="cutouts">Вырезы под розетки, шт</label>
-                <input type="number" id="cutouts" min="0" step="1" value="0">
+              <div class="form-row options-row">
+                <div class="field">
+                  <label for="corners">Углы, шт</label>
+                  <input type="number" id="corners" min="0" step="1" value="0">
+                </div>
+                <div class="field">
+                  <label for="cutouts">Вырезы под розетки, шт</label>
+                  <input type="number" id="cutouts" min="0" step="1" value="0">
+                </div>
               </div>
-            </div>
+            </fieldset>
 
-            <div class="form-row">
-              <div class="field">
-                <label for="calcPhone">Телефон / Telegram</label>
-                <input type="text" id="calcPhone" placeholder="+7 (___) ___-__-__ или @username" required>
-                <small class="error" data-error="calcPhone"></small>
+            <fieldset class="wiz-step" data-step="4">
+              <legend class="sr-only">Контакты</legend>
+              <div class="form-row">
+                <div class="field">
+                  <label for="calcPhone">Телефон / Telegram</label>
+                  <input type="text" id="calcPhone" placeholder="+7 (___) ___-__-__ или @username" required>
+                  <small class="error" data-error="calcPhone"></small>
+                </div>
+                <div class="field">
+                  <label for="calcCompany">Компания</label>
+                  <input type="text" id="calcCompany" placeholder="Название студии или компании">
+                </div>
               </div>
-              <div class="field">
-                <label for="calcCompany">Компания</label>
-                <input type="text" id="calcCompany" placeholder="Название студии или компании">
-              </div>
-            </div>
+              <label class="consent">
+                <input type="checkbox" id="calcConsent" required>
+                <span>Согласен на обработку персональных данных</span>
+              </label>
+              <small class="error" data-error="calcConsent"></small>
+            </fieldset>
 
-            <label class="consent">
-              <input type="checkbox" id="calcConsent" required>
-              <span>Согласен на обработку персональных данных</span>
-            </label>
-            <small class="error" data-error="calcConsent"></small>
+            <div class="wizard-nav">
+              <button type="button" class="btn btn-outline" id="wizPrev">Назад</button>
+              <button type="button" class="btn btn-accent" id="wizNext">Далее</button>
+            </div>
           </form>
 
           <aside class="calc-result" id="calcResult">
@@ -278,6 +316,53 @@
       </div>
     </section>
 
+    <!-- CONFIGURATOR -->
+    <section class="section section-light" id="configurator">
+      <div class="container config-grid">
+        <div>
+          <div class="eyebrow">Конфигуратор</div>
+          <h2>Посмотрите текстуру на кухне</h2>
+          <p>Выберите коллекцию — фартук на макете кухни обновится. Здесь же можно сразу перейти к расчёту выбранной текстуры.</p>
+          <div class="config-swatches" id="configSwatches">
+            <button type="button" class="swatch texture-stone is-active" data-collection="stone" data-name="Камень · Классический" aria-label="Камень"></button>
+            <button type="button" class="swatch texture-wood" data-collection="wood" data-name="Дерево · Дуб" aria-label="Дерево"></button>
+            <button type="button" class="swatch texture-concrete" data-collection="concrete" data-name="Бетон · Графит" aria-label="Бетон"></button>
+            <button type="button" class="swatch texture-3d" data-collection="3d" data-name="3D · Соты" aria-label="3D-геометрия"></button>
+          </div>
+          <div class="config-selected" id="configCaption">Камень · Классический</div>
+          <button type="button" class="btn btn-accent" id="configApply">Рассчитать выбранную</button>
+        </div>
+        <div class="config-visual">
+          <div class="config-wall">
+            <div class="config-upper"></div>
+            <div class="config-apron texture-stone" id="configApron"></div>
+            <div class="config-counter"></div>
+            <div class="config-lower"></div>
+          </div>
+          <div class="config-hint">Превью · заменить на фото объекта</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3D VIEWER -->
+    <section class="section section-dark" id="viewer">
+      <div class="container viewer-grid">
+        <div>
+          <div class="eyebrow">3D-просмотр</div>
+          <h2>Поверните панель и увидьте толщину</h2>
+          <p>Потяните мышкой или пальцем, чтобы осмотреть срез 33 мм с разных сторон.</p>
+          <button type="button" class="btn btn-outline" id="viewerReset">Сбросить вид</button>
+        </div>
+        <div class="viewer-stage" id="viewerStage">
+          <div class="viewer-panel" id="viewerPanel">
+            <div class="viewer-face texture-stone"></div>
+            <div class="viewer-edge"></div>
+          </div>
+          <div class="viewer-shadow"></div>
+        </div>
+      </div>
+    </section>
+
     <!-- SPECS -->
     <section class="section section-light" id="specs">
       <div class="container specs-grid">
@@ -285,7 +370,7 @@
           <div class="eyebrow">Документация</div>
           <h2>Технические данные</h2>
           <p>Полная техкарта и параметры партии предоставляются по запросу.</p>
-          <a href="#lead" class="btn btn-accent">Скачать техкарту PDF</a>
+          <button type="button" class="btn btn-accent" id="techPdf">Скачать техкарту PDF</button>
         </div>
         <div class="table-wrap">
           <table class="spec-table">
@@ -296,6 +381,27 @@
               <tr><th>Влагостойкость</th><td>уточняется</td></tr>
               <tr><th>Термостойкость</th><td>уточняется</td></tr>
               <tr><th>Способ монтажа</th><td>уточняется</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- COMPARE -->
+    <section class="section" id="compare">
+      <div class="container">
+        <div class="section-head">
+          <div class="eyebrow">Сравнение</div>
+          <h2>Почему 33 мм, а не тонкий фартук</h2>
+        </div>
+        <div class="table-wrap">
+          <table class="compare-table">
+            <thead><tr><th>Материал</th><th>Толщина</th><th>Геометрия</th><th>Стыки</th><th>Для B2B-объекта</th></tr></thead>
+            <tbody>
+              <tr><td>Тонкий PVC / SPC</td><td>3 мм</td><td><span class="rating">●○○</span> гнётся</td><td><span class="rating">●○○</span> заметны</td><td>Ограниченно</td></tr>
+              <tr><td>Керамическая плитка</td><td>8–12 мм</td><td><span class="rating">●●●</span> жёсткая</td><td><span class="rating">●○○</span> затирка</td><td>Да, но долгий монтаж</td></tr>
+              <tr><td>Кварцевый агломерат</td><td>20–30 мм</td><td><span class="rating">●●●</span> жёсткая</td><td><span class="rating">●●●</span> минимальные</td><td>Да, высокая цена</td></tr>
+              <tr class="highlight"><td><b>Наш 3D-фартук</b></td><td><b>33 мм</b></td><td><span class="rating">●●●</span> жёсткий модуль</td><td><span class="rating">●●●</span> точные</td><td><b>Да · расчёт онлайн</b></td></tr>
             </tbody>
           </table>
         </div>
@@ -337,10 +443,22 @@
           <div class="eyebrow">Практика</div>
           <h2>Объекты в Казани и регионах</h2>
         </div>
-        <div class="grid-3 cases-grid">
-          <div class="case-card texture-concrete"><span class="case-label">Кухня — до / после</span></div>
-          <div class="case-card texture-stone"><span class="case-label">Объект в Казани</span></div>
-          <div class="case-card texture-wood"><span class="case-label">Деталь стыка 33 мм</span></div>
+        <div class="collection-filters" id="caseFilters" role="group" aria-label="Фильтр объектов">
+          <button type="button" class="filter-btn is-active" data-case-filter="all">Все</button>
+          <button type="button" class="filter-btn" data-case-filter="kitchen">Кухни</button>
+          <button type="button" class="filter-btn" data-case-filter="kazan">Казань</button>
+          <button type="button" class="filter-btn" data-case-filter="detail">Детали</button>
+        </div>
+        <div class="cases-carousel" id="casesCarousel">
+          <div class="case-card texture-concrete" data-case-type="kitchen"><span class="case-label">Кухня — до / после</span></div>
+          <div class="case-card texture-stone" data-case-type="kazan"><span class="case-label">Объект в Казани</span></div>
+          <div class="case-card texture-wood" data-case-type="detail"><span class="case-label">Деталь стыка 33 мм</span></div>
+          <div class="case-card texture-3d" data-case-type="kitchen"><span class="case-label">Кухня-гостиная</span></div>
+          <div class="case-card texture-stone variant-2" data-case-type="kazan"><span class="case-label">Шоурум в Казани</span></div>
+        </div>
+        <div class="carousel-nav">
+          <button type="button" class="carousel-btn" id="casePrev" aria-label="Предыдущий объект">←</button>
+          <button type="button" class="carousel-btn" id="caseNext" aria-label="Следующий объект">→</button>
         </div>
       </div>
     </section>
@@ -357,6 +475,39 @@
           <div class="step"><b>2</b><span>Образец и подбор текстуры</span></div>
           <div class="step"><b>3</b><span>Счёт и формирование партии</span></div>
           <div class="step"><b>4</b><span>Отгрузка по России</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="section section-light" id="faq">
+      <div class="container faq-grid">
+        <div class="section-head">
+          <div class="eyebrow">Вопросы</div>
+          <h2>Частые вопросы</h2>
+          <p class="section-sub" style="margin-left:0">Не нашли ответ? Отправьте запрос — менеджер ответит по вашему проекту.</p>
+        </div>
+        <div class="faq-list">
+          <details class="faq-item">
+            <summary>Как заказать образец?<span class="faq-icon">+</span></summary>
+            <div class="faq-body"><div><p>Оставьте заявку в калькуляторе или форме «Получить КП» — менеджер согласует образец и отправит его в Казань или другой город России.</p></div></div>
+          </details>
+          <details class="faq-item">
+            <summary>Сколько идёт доставка по России?<span class="faq-icon">+</span></summary>
+            <div class="faq-body"><div><p>По Казани — 3–5 дней, в регионы — 5–9 дней. Точный срок зависит от партии и транспортной компании.</p></div></div>
+          </details>
+          <details class="faq-item">
+            <summary>Можно ли подобрать текстуру под проект?<span class="faq-icon">+</span></summary>
+            <div class="faq-body"><div><p>Да. Дизайнерам и архитекторам предоставляются образцы, текстуры, техническая документация и помощь в подборе.</p></div></div>
+          </details>
+          <details class="faq-item">
+            <summary>Как монтируется панель 33 мм?<span class="faq-icon">+</span></summary>
+            <div class="faq-body"><div><p>Панель монтируется на подготовленную стену. Способ крепления и параметры партии уточняются в техкарте.</p></div></div>
+          </details>
+          <details class="faq-item">
+            <summary>Есть ли техкарта и 3D-модели?<span class="faq-icon">+</span></summary>
+            <div class="faq-body"><div><p>Техническая карта и материалы для проекта предоставляются по запросу для дизайнеров и подрядчиков.</p></div></div>
+          </details>
         </div>
       </div>
     </section>
@@ -425,6 +576,13 @@
     </section>
   </main>
 
+  <!-- STICKY CTA -->
+  <div class="sticky-cta" id="stickyCta">
+    <span>3D-фартук 33 мм — расчёт за 30 секунд</span>
+    <a href="#calculator" class="btn btn-accent">Рассчитать</a>
+    <a href="#lead" class="btn btn-outline">КП</a>
+  </div>
+
   <!-- FOOTER -->
   <footer class="site-footer">
     <div class="container footer-inner">
@@ -448,6 +606,6 @@
     <a href="https://t.me/" class="btn btn-outline" target="_blank" rel="noopener">Telegram</a>
   </div>
 
-  <script src="script.js?v=3"></script>
+  <script src="script.js?v=5"></script>
 </body>
 </html>

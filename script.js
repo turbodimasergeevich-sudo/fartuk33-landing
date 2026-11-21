@@ -279,7 +279,7 @@ $$('#nav a').forEach((a) => a.addEventListener('click', () => $('#nav').classLis
 /* ---------- Скрытая админ-ссылка (?admin=1) ---------- */
 if (new URLSearchParams(location.search).has('admin')) {
   const link = document.createElement('a');
-  link.href = 'admin.html?v=2';
+  link.href = 'admin.html?v=3';
   link.className = 'admin-floating';
   link.textContent = 'Админ: заявки';
   document.body.appendChild(link);
@@ -364,3 +364,166 @@ $$('.collection-card', collectionsGrid).forEach((card) => {
     $('#calculator').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth' });
   });
 });
+
+/* ---------- Мастер расчёта ---------- */
+const wizardSteps = $$('.wiz-step');
+const wizardLabels = ['Размеры', 'Текстура и клиент', 'Доставка и опции', 'Контакты'];
+let wizardStep = 1;
+
+function showWizardStep(n) {
+  wizardStep = n;
+  wizardSteps.forEach((step, i) => step.classList.toggle('is-active', i === n - 1));
+  $('#wizardBar').style.width = (n / wizardSteps.length) * 100 + '%';
+  $('#wizardLabel').textContent = `Шаг ${n} из ${wizardSteps.length} · ${wizardLabels[n - 1]}`;
+  $('#wizPrev').disabled = n === 1;
+  $('#wizNext').textContent = n === wizardSteps.length ? 'Отправить запрос' : 'Далее';
+}
+$('#wizPrev').addEventListener('click', () => showWizardStep(Math.max(1, wizardStep - 1)));
+$('#wizNext').addEventListener('click', () => {
+  if (wizardStep === 1) {
+    clearErrors(calcForm);
+    let bad = false;
+    const w = num($('#width').value);
+    const h = num($('#height').value);
+    if (w < 0.1 || w > 20) { setError('width', 'Укажите ширину от 0,1 до 20 м'); bad = true; }
+    if (h < 0.1 || h > 5) { setError('height', 'Укажите высоту от 0,1 до 5 м'); bad = true; }
+    if (bad) return;
+  }
+  if (wizardStep === wizardSteps.length) {
+    calcForm.requestSubmit();
+    return;
+  }
+  showWizardStep(wizardStep + 1);
+});
+showWizardStep(1);
+
+/* ---------- Конфигуратор ---------- */
+const configSwatches = $$('.swatch');
+let chosenCollection = 'stone';
+configSwatches.forEach((swatch) => {
+  swatch.addEventListener('click', () => {
+    chosenCollection = swatch.dataset.collection;
+    configSwatches.forEach((s) => s.classList.toggle('is-active', s === swatch));
+    $('#configCaption').textContent = swatch.dataset.name;
+    const apron = $('#configApron');
+    apron.className = 'config-apron changing';
+    window.setTimeout(() => {
+      apron.className = 'config-apron texture-' + chosenCollection;
+    }, reduceMotion ? 0 : 180);
+  });
+});
+$('#configApply').addEventListener('click', () => {
+  $('#collection').value = chosenCollection;
+  renderCalc();
+  $('#calculator').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth' });
+});
+
+/* ---------- 3D-просмотр ---------- */
+const viewerStage = $('#viewerStage');
+const viewerPanel = $('#viewerPanel');
+let rotX = -12, rotY = -20, dragging = false, startX = 0, startY = 0;
+viewerStage.addEventListener('pointerdown', (e) => {
+  dragging = true; startX = e.clientX; startY = e.clientY;
+  viewerStage.setPointerCapture(e.pointerId);
+});
+viewerStage.addEventListener('pointermove', (e) => {
+  if (!dragging) return;
+  rotY += (e.clientX - startX) * 0.4;
+  rotX -= (e.clientY - startY) * 0.3;
+  rotX = Math.max(-60, Math.min(30, rotX));
+  startX = e.clientX; startY = e.clientY;
+  viewerPanel.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg)`;
+});
+viewerStage.addEventListener('pointerup', () => { dragging = false; });
+viewerStage.addEventListener('pointercancel', () => { dragging = false; });
+$('#viewerReset').addEventListener('click', () => {
+  rotX = -12; rotY = -20;
+  viewerPanel.style.transform = 'rotateX(-12deg) rotateY(-20deg)';
+});
+
+/* ---------- Карусель кейсов ---------- */
+const caseFilters = $$('[data-case-filter]');
+caseFilters.forEach((btn) => {
+  btn.addEventListener('click', () => {
+    caseFilters.forEach((b) => b.classList.toggle('is-active', b === btn));
+    const filter = btn.dataset.caseFilter;
+    $$('.case-card').forEach((card) => card.classList.toggle('is-hidden', filter !== 'all' && card.dataset.caseType !== filter));
+    $('#casesCarousel').scrollTo({ left: 0, behavior: 'smooth' });
+  });
+});
+$('#casePrev').addEventListener('click', () => $('#casesCarousel').scrollBy({ left: -320, behavior: 'smooth' }));
+$('#caseNext').addEventListener('click', () => $('#casesCarousel').scrollBy({ left: 320, behavior: 'smooth' }));
+
+/* ---------- Липкий CTA ---------- */
+const stickyCta = $('#stickyCta');
+function updateSticky() {
+  const heroEnd = $('#hero').offsetTop + $('#hero').offsetHeight;
+  const leadTop = $('#lead').offsetTop;
+  stickyCta.classList.toggle('visible', window.scrollY > heroEnd - 120 && window.scrollY < leadTop - 200);
+}
+window.addEventListener('scroll', updateSticky, { passive: true });
+window.addEventListener('resize', updateSticky);
+updateSticky();
+
+/* ---------- PDF-документы (печать из браузера) ---------- */
+function openPrintable(title, rows, note) {
+  const win = window.open('', '_blank', 'width=800,height=900');
+  if (!win) return alert('Разрешите всплывающие окна для скачивания PDF');
+  const body = rows.map((r) => `<tr><td>${r[0]}</td><td><b>${r[1]}</b></td></tr>`).join('');
+  win.document.write(`<!DOCTYPE html><html lang="ru"><head><meta charset="utf-8"><title>${title}</title>
+    <style>
+      body{font-family:Arial,sans-serif;color:#161A1F;padding:40px;max-width:760px;margin:0 auto}
+      h1{font-size:26px;margin:0 0 6px}.date{color:#8b8f94;font-size:12px;margin-bottom:26px}
+      table{width:100%;border-collapse:collapse;font-size:14px}
+      td{padding:10px 8px;border-bottom:1px solid #ddd}
+      .note{margin-top:24px;font-size:11px;color:#6b7178;line-height:1.5}
+      @media print{body{padding:0}}
+    </style></head><body>
+    <h1>${title}</h1><div class="date">${new Date().toLocaleDateString('ru-RU')} · Казань</div>
+    <table>${body}</table><p class="note">${note}</p>
+    </body></html>`);
+  win.document.close();
+  win.focus();
+  window.setTimeout(() => win.print(), 350);
+}
+$('#pricePdf').addEventListener('click', () => {
+  const rows = [
+    ['Базовая цена (бетон), ₽/м²', fmtMoney(CONFIG.basePrice)],
+    ...Object.entries(CONFIG.collectionCoeff).map(([k, v]) => [
+      'Коллекция ' + ({ stone: 'Камень', wood: 'Дерево', concrete: 'Бетон', '3d': '3D-геометрия' })[k],
+      fmtMoney(CONFIG.basePrice * v) + ' / м²'
+    ]),
+    ['Скидка дизайнерам', '−10%'],
+    ['Скидка подрядчикам', '−15%'],
+    ['Скидка дилерам', '−25%'],
+    ['Угол, ₽/шт', fmtMoney(CONFIG.optionCost.corner)],
+    ['Вырез под розетку, ₽/шт', fmtMoney(CONFIG.optionCost.cutout)],
+    ['Доставка: Казань / регионы', '0 ₽ / ' + fmtMoney(CONFIG.deliveryCost.region)]
+  ];
+  openPrintable('Прайс-лист · 3D-фартук 33 мм', rows, 'Цены ориентировочные. Точный счёт формируется после согласования образца и партии. Укажите «Сохранить как PDF» в окне печати.');
+});
+$('#techPdf').addEventListener('click', () => {
+  openPrintable('Техническая карта · 3D-фартук 33 мм', [
+    ['Толщина', '33 мм'],
+    ['Размер панели', 'уточняется'],
+    ['Вес', 'уточняется'],
+    ['Влагостойкость', 'уточняется'],
+    ['Термостойкость', 'уточняется'],
+    ['Способ монтажа', 'уточняется'],
+    ['Запас на подрезку', '7%'],
+    ['Срок отгрузки: Казань / регионы', '3–5 / 5–9 дней']
+  ], 'Документ заполняется по реальным параметрам партии перед запуском продаж.');
+});
+
+/* ---------- PWA ---------- */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  });
+}
+
+/* ---------- A/B-тест первого экрана ---------- */
+const heroVariant = localStorage.getItem('hero_variant') || (Math.random() < 0.5 ? 'a' : 'b');
+localStorage.setItem('hero_variant', heroVariant);
+document.body.classList.add('hero-' + heroVariant);
+trackGoal('hero_variant_' + heroVariant);
